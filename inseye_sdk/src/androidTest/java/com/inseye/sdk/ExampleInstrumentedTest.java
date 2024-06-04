@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.inseye.sdk", appContext.getPackageName());
+        assertEquals("com.inseye.sdk.test", appContext.getPackageName());
     }
 }
