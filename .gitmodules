@@ -1,0 +1,3 @@
+[submodule "inseye_client_api"]
+	path = inseye_client_api
+	url = https://github.com/Inseye/Inseye-SDK-Android-API
