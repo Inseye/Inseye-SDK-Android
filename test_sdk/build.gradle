@@ -1,18 +1,19 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.application)
 }
 
 android {
-    namespace 'com.inseye.sdk'
+    namespace 'com.inseye.test_sdk'
     compileSdk 34
 
     defaultConfig {
+        applicationId "com.inseye.test_sdk"
         minSdk 27
-
-        versionName '0.1-alpha'
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
@@ -25,22 +26,15 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
-    libraryVariants.configureEach { variant ->
-        variant.outputs.all {
-            outputFileName = "inseye_sdk_android_${variant.name}-${defaultConfig.versionName}.aar"
-        }
-    }
 }
 
 dependencies {
 
     implementation libs.appcompat
     implementation libs.material
-    implementation libs.commons.math3
-
-
-    implementation project(':inseye_client_api')
+    implementation libs.activity
+    implementation libs.constraintlayout
+    implementation project(':inseye_sdk')
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

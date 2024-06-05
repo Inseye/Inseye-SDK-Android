@@ -25,3 +25,4 @@ project(':inseye_client_api').projectDir = new File(rootDir, 'inseye_client_api/
 
 
 include ':inseye_sdk'
+include ':test_sdk'
