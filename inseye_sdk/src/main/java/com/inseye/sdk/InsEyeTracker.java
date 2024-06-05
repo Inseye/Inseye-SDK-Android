@@ -2,15 +2,22 @@ package com.inseye.sdk;
 
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.inseye.shared.communication.ActionResult;
 import com.inseye.shared.communication.GazeData;
 import com.inseye.shared.communication.IBuiltInCalibrationCallback;
 import com.inseye.shared.communication.IServiceBuiltInCalibrationCallback;
 import com.inseye.shared.communication.ISharedService;
+import com.inseye.shared.communication.IntActionResult;
 import com.inseye.shared.communication.Version;
 import com.inseye.shared.communication.TrackerAvailability;
 
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 public class InsEyeTracker {
@@ -22,6 +29,8 @@ public class InsEyeTracker {
     private Version firmwareVersion;
 
     private IServiceBuiltInCalibrationCallback calibrationAbortHandler;
+    private GazeDataReader gazeDataReader;
+
 
     protected InsEyeTracker(ISharedService serviceInterface) {
         this.serviceInterface = serviceInterface;
@@ -51,16 +60,40 @@ public class InsEyeTracker {
     }
 
 
-    public GazeData getLastGazeData() {
+    public GazeData getMostRecentGazeData() {
         return null;
     }
 
-    public void subscribeToGazeData(GazeDataReader.IGazeData gazeData){
+    public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeData){
+        try {
+            //int port = serviceInterface.isStreamingGazeData();
+            IntActionResult result = serviceInterface.startStreamingGazeData();
+            if(result.success) {
+                int udpPort = result.value;
+                Log.i(TAG, "port:" + udpPort);
+                gazeDataReader = new GazeDataReader(udpPort, gazeData);
+                gazeDataReader.start();
+            } else {
+                Log.e(TAG, "gaze stream error: " + result.errorMessage);
+                //Toast.makeText(this, "gaze stream error: " + result.errorMessage, Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (RemoteException | SocketException | UnknownHostException e) {
+            Log.e(TAG, e.toString());
+            //Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+
 
     }
 
     public void unsubscribeToGazeData() {
-
+        try {
+            serviceInterface.stopStreamingGazeData();
+            gazeDataReader.interrupt();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void abortCalibration() {
