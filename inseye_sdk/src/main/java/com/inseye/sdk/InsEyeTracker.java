@@ -25,8 +25,8 @@ public class InsEyeTracker {
 
     private final ISharedService serviceInterface;
 
-    private Version serviceVersion;
-    private Version firmwareVersion;
+    private final Version serviceVersion = new Version();
+    private final Version firmwareVersion = new Version();
 
     private IServiceBuiltInCalibrationCallback calibrationAbortHandler;
     private GazeDataReader gazeDataReader;
@@ -87,7 +87,7 @@ public class InsEyeTracker {
 
     }
 
-    public void unsubscribeToGazeData() {
+    public void unsubscribeFromGazeData() {
         try {
             serviceInterface.stopStreamingGazeData();
             gazeDataReader.interrupt();

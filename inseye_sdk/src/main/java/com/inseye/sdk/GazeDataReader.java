@@ -45,6 +45,7 @@ public class GazeDataReader extends Thread implements Closeable {
         socket.setReuseAddress(true);
         socket.bind(new InetSocketAddress(address, port));
         Log.i(TAG, "port: " + socket.getLocalPort());
+        super.setName(GazeDataReader.class.getSimpleName());
 
         // Initialize the buffer to hold incoming gaze data
         gazeBuffer = new LinkedBlockingQueue<>(100);

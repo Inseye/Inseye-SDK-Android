@@ -13,6 +13,8 @@ import com.inseye.shared.communication.ISharedService;
 import java.util.concurrent.CompletableFuture;
 
 public class InseyeServiceBinder {
+    private static final String TAG = InseyeServiceBinder.class.getSimpleName();
+
     private final Context context;
     private IServiceBindCallback inseyeServiceConnection;
 

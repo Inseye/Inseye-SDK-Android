@@ -4,6 +4,13 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
+
+import java.io.Console;
+import java.util.concurrent.ExecutionException;
+
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -14,4 +21,5 @@ public class ExampleUnitTest {
     public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
     }
+
 }
