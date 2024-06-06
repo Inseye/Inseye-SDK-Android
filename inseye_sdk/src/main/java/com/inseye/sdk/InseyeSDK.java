@@ -1,45 +1,57 @@
 package com.inseye.sdk;
 
 import android.content.Context;
-import android.os.RemoteException;
 import android.util.Log;
 
 import com.inseye.shared.communication.ISharedService;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * The main entry point for interacting with the Inseye SDK.
+ */
 public class InseyeSDK {
     private static final String TAG = InseyeSDK.class.getSimpleName();
 
     private final Context context;
     private final InseyeServiceBinder serviceBinder;
+
+    /**
+     * Constructs a new InseyeSDK instance.
+     *
+     * @param context The application context.
+     */
     public InseyeSDK(Context context) {
         this.context = context;
         serviceBinder = new InseyeServiceBinder(context);
     }
 
-
+    /**
+     * Checks if the Inseye service is connected.
+     *
+     * @return True if the service is connected, false otherwise.
+     */
     public boolean isServiceConnected() {
         return serviceBinder.isConnected();
     }
 
-    public CompletableFuture<InsEyeTracker> getEyeTracker() {
-        CompletableFuture<InsEyeTracker> trackerFuture = new CompletableFuture<>();
+    /**
+     * Asynchronously retrieves an instance of {@link InseyeTracker}.
+     *
+     * @return A CompletableFuture that completes with an InseyeTracker instance when the service is connected,
+     *         or completes exceptionally if an error occurs.
+     */
+    public CompletableFuture<InseyeTracker> getEyeTracker() {
+        CompletableFuture<InseyeTracker> trackerFuture = new CompletableFuture<>();
         serviceBinder.bind(new InseyeServiceBinder.IServiceBindCallback() {
             @Override
             public void serviceConnected(ISharedService service) {
-                try {
-                    Log.i(TAG, "service connected " + service.getTrackerAvailability().toString());
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
-                trackerFuture.complete(new InsEyeTracker(service));
+                trackerFuture.complete(new InseyeTracker(service));
             }
 
             @Override
             public void serviceDisconnected() {
                 Log.i(TAG, "service disconnected");
-
                 trackerFuture.completeExceptionally(new Exception("service disconnected"));
             }
 
@@ -48,12 +60,8 @@ public class InseyeSDK {
                 Log.e(TAG, "service connection error: " + e.getMessage());
                 trackerFuture.completeExceptionally(e);
             }
-
-
         });
+
         return trackerFuture;
     }
-
-
-
 }

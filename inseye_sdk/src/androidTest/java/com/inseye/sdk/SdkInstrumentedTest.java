@@ -24,7 +24,7 @@ public class SdkInstrumentedTest {
         InseyeSDK inseyeSDK = new InseyeSDK(appContext);
 
         try {
-            InsEyeTracker eyeTracker = inseyeSDK.getEyeTracker().get();
+            InseyeTracker eyeTracker = inseyeSDK.getEyeTracker().get();
             System.out.println("tracker status: " + eyeTracker.getTrackerAvailability());
             System.out.println("service: " + eyeTracker.getServiceVersion());
             System.out.println("firmware: " + eyeTracker.getFirmwareVersion());

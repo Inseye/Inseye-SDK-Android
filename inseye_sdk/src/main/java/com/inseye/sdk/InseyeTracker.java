@@ -2,13 +2,14 @@ package com.inseye.sdk;
 
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.inseye.shared.communication.ActionResult;
+import com.inseye.shared.communication.Eye;
 import com.inseye.shared.communication.GazeData;
 import com.inseye.shared.communication.IBuiltInCalibrationCallback;
+import com.inseye.shared.communication.IEyetrackerEventListener;
 import com.inseye.shared.communication.IServiceBuiltInCalibrationCallback;
 import com.inseye.shared.communication.ISharedService;
 import com.inseye.shared.communication.IntActionResult;
@@ -17,40 +18,58 @@ import com.inseye.shared.communication.TrackerAvailability;
 
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
-public class InsEyeTracker {
-    private static final String TAG = InsEyeTracker.class.getSimpleName();
-
+/**
+ * The main class for interacting with the Inseye eye tracker.
+ */
+public class InseyeTracker {
+    private static final String TAG = InseyeTracker.class.getSimpleName();
     private final ISharedService serviceInterface;
-
     private final Version serviceVersion = new Version();
     private final Version firmwareVersion = new Version();
-
     private IServiceBuiltInCalibrationCallback calibrationAbortHandler;
     private GazeDataReader gazeDataReader;
 
 
-    protected InsEyeTracker(ISharedService serviceInterface) {
+    /**
+     * Constructs a new InseyeTracker instance.
+     *
+     * @param serviceInterface The interface for communicating with the Inseye service.
+     */
+    protected InseyeTracker(ISharedService serviceInterface) {
         this.serviceInterface = serviceInterface;
         try {
             serviceInterface.getVersions(serviceVersion, firmwareVersion);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
-
     }
 
+    /**
+     * Returns the version of the Inseye service.
+     *
+     * @return The service version.
+     */
     public Version getServiceVersion() {
         return serviceVersion;
     }
 
+    /**
+     * Returns the version of the eye tracker firmware.
+     *
+     * @return The firmware version.
+     */
     public Version getFirmwareVersion(){
         return firmwareVersion;
     }
 
-
+    /**
+     * Returns the current availability status of the eye tracker.
+     * Tracker is fully operational on status: Available
+     *
+     * @return The tracker availability.
+     */
     public TrackerAvailability getTrackerAvailability() {
         try {
             return serviceInterface.getTrackerAvailability();
@@ -59,14 +78,61 @@ public class InsEyeTracker {
         }
     }
 
-
-    public GazeData getMostRecentGazeData() {
-        return null;
+    /**
+     * Subscribes to eye tracker status events.
+     *
+     * @param eventListener The listener to receive eye tracker status events.
+     */
+    public void subscribeToTrackerStatus(IEyetrackerEventListener eventListener) {
+        try {
+            serviceInterface.subscribeToEyetrackerEvents(eventListener);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeData){
+    /**
+     * Unsubscribes from eye tracker status events.
+     */
+    public void unsubscribeFromTrackerStatus() {
         try {
-            //int port = serviceInterface.isStreamingGazeData();
+            serviceInterface.unsubscribeFromEyetrackerEvents();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Returns the dominant eye of the user.
+     *
+     * @return The dominant eye.
+     */
+    public Eye getDominantEye() {
+        try {
+            return serviceInterface.getDominantEye();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Returns the most recent gaze data.
+     *
+     * @return The most recent gaze data, or null if no gaze data is available.
+     */
+    public GazeData getMostRecentGazeData() {
+        return null; // TODO: Implement this method to return the most recent gaze data.
+    }
+
+
+    /**
+     * Subscribes to gaze data updates.
+     *
+     * @param gazeData The listener to receive gaze data updates.
+     * @throws InseyeTrackerException If an error occurs while subscribing to gaze data.
+     */
+    public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeData) throws InseyeTrackerException {
+        try {
             IntActionResult result = serviceInterface.startStreamingGazeData();
             if(result.success) {
                 int udpPort = result.value;
@@ -75,18 +141,18 @@ public class InsEyeTracker {
                 gazeDataReader.start();
             } else {
                 Log.e(TAG, "gaze stream error: " + result.errorMessage);
-                //Toast.makeText(this, "gaze stream error: " + result.errorMessage, Toast.LENGTH_SHORT).show();
+                throw new InseyeTrackerException(result.errorMessage);
             }
 
         } catch (RemoteException | SocketException | UnknownHostException e) {
             Log.e(TAG, e.toString());
-            //Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            throw new InseyeTrackerException(e);
         }
-
-
-
     }
 
+    /**
+     * Unsubscribes from gaze data updates.
+     */
     public void unsubscribeFromGazeData() {
         try {
             serviceInterface.stopStreamingGazeData();
@@ -96,6 +162,9 @@ public class InsEyeTracker {
         }
     }
 
+    /**
+     * Aborts the ongoing calibration procedure.
+     */
     public void abortCalibration() {
         try {
             if(calibrationAbortHandler != null) calibrationAbortHandler.abortCalibrationProcedure();
@@ -104,7 +173,12 @@ public class InsEyeTracker {
         }
     }
 
-
+    /**
+     * Starts the built-in calibration procedure.
+     *
+     * @return A CompletableFuture that completes when the calibration procedure finishes.
+     *         The result of the future indicates whether the calibration was successful.
+     */
     public CompletableFuture<ActionResult> startCalibration() {
         CompletableFuture<ActionResult> calibrationFuture = new CompletableFuture<>();
         ActionResult result = new ActionResult();
@@ -116,13 +190,10 @@ public class InsEyeTracker {
                     if(calibrationResult.successful) {
                         Log.e(TAG, "calibration success");
                         calibrationFuture.complete(ActionResult.success());
-                        //Toast.makeText(con, "calibration success", Toast.LENGTH_SHORT).show();
                     }
                     else {
                         calibrationFuture.complete(ActionResult.error(calibrationResult.errorMessage));
-
                         Log.e(TAG, "calibration fail: " + calibrationResult.errorMessage);
-                        //Toast.makeText(MainActivity.this, "calibration fail: " + calibrationResult.errorMessage, Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -132,22 +203,12 @@ public class InsEyeTracker {
         }
         if(result.successful) {
             Log.i(TAG, "calibration init success");
-            //Toast.makeText(MainActivity.this, "calibration init success", Toast.LENGTH_SHORT).show();
-            //calibrationAbortHandler could be used to abort calibration
         }
         else {
             Log.e(TAG, "calibration init fail: " + result.errorMessage);
             calibrationFuture.complete(ActionResult.error(result.errorMessage));
-
-            //Toast.makeText(this, "calibration init fail: " + result.errorMessage, Toast.LENGTH_SHORT).show();
-            //calibrationAbortHandler is null
         }
+
         return calibrationFuture;
     }
-
-
-
-
-
-
 }
