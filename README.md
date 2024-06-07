@@ -9,8 +9,9 @@ The Inseye SDK provides tools for interacting with the Inseye eye tracking servi
 
 - [Overview](#overview)
 - [Installation](#installation)
+- [Requirements](#requirements)
 - [Usage](#usage)
-  - [InseyeSDK](#inseyedsdk)
+  - [InseyeSDK](#inseyesdk)
   - [InseyeTracker](#inseyetracker)
 - [License](#license)
 
@@ -23,6 +24,19 @@ dependencies {
     implementation 'com.inseye.sdk:inseye-sdk:1.0.0'
 }
 ```
+
+## Requirements
+
+To function properly, the Inseye SDK requires the following components to be installed on the device:
+- Inseye Android Service
+    - [Inseye Android Service STANDARD](https://install.appcenter.ms/orgs/inseye/apps/inseye-service/distribution_groups/inseye%20public) - public version
+    - [Inseye Android Service PRO](https://install.appcenter.ms/orgs/inseye/apps/inseye-service/distribution_groups/inseye%20internal) - internal and for privaledged users version
+- Inseye Calibration - depend on target platform
+  - [Inseye Calibration OpenXR Pico](https://install.appcenter.ms/orgs/inseye/apps/inseye-calibration-openxr-pico/distribution_groups/inseye%20public)
+  - [Inseye Calibration OpenXR Oculus](https://install.appcenter.ms/orgs/inseye/apps/inseye-calibration-openxr-quest/distribution_groups/inseye%20public)
+  - [Inseye Calibration FlatScreen](https://install.appcenter.ms/orgs/inseye/apps/inseye-calibration-flat-screen/distribution_groups/inseye%20public)
+
+Please ensure these components are installed and running on the device.
 
 ## Usage
 
@@ -171,6 +185,6 @@ public CompletableFuture<ActionResult> startCalibration()
 
 Starts the built-in calibration procedure. Returns a `CompletableFuture` that completes when the calibration procedure finishes. The result of the future indicates whether the calibration was successful.
 
-
+## License
 
 This project is licensed under [place for license]
