@@ -52,13 +52,13 @@ public class InseyeSDK {
             @Override
             public void serviceDisconnected() {
                 Log.i(TAG, "service disconnected");
-                trackerFuture.completeExceptionally(new Exception("service disconnected"));
+                trackerFuture.completeExceptionally(new InseyeTrackerException("service disconnected"));
             }
 
             @Override
             public void serviceError(Exception e) {
                 Log.e(TAG, "service connection error: " + e.getMessage());
-                trackerFuture.completeExceptionally(e);
+                trackerFuture.completeExceptionally(new InseyeTrackerException(e));
             }
         });
 

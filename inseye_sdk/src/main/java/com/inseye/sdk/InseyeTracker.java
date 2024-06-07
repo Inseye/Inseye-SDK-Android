@@ -208,6 +208,7 @@ public class InseyeTracker {
             Log.e(TAG, "calibration init fail: " + result.errorMessage);
             calibrationFuture.complete(ActionResult.error(result.errorMessage));
         }
+        // add timeout
 
         return calibrationFuture;
     }
