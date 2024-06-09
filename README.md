@@ -8,12 +8,25 @@ The Inseye SDK provides tools for interacting with the Inseye eye tracking servi
 ## Table of Contents
 
 - [Overview](#overview)
-- [Installation](#installation)
 - [Requirements](#requirements)
+- [Installation](#installation)
 - [Usage](#usage)
   - [InseyeSDK](#inseyesdk)
   - [InseyeTracker](#inseyetracker)
 - [License](#license)
+
+## Requirements
+
+To function properly, the Inseye SDK requires the following components to be installed on the device:
+- Inseye Android Service
+    - [Inseye Android Service STANDARD](https://install.appcenter.ms/orgs/inseye/apps/inseye-service/distribution_groups/inseye%20public) - public version with only nessesary options exposed
+    - [Inseye Android Service PRO](https://install.appcenter.ms/orgs/inseye/apps/inseye-service/distribution_groups/inseye%20internal) - for internal and privaledged users. Requires acces to be granted by Inseye 
+- Inseye Calibration - depends on target platform
+  - [Inseye Calibration OpenXR Pico](https://install.appcenter.ms/orgs/inseye/apps/inseye-calibration-openxr-pico/distribution_groups/inseye%20public)
+  - [Inseye Calibration OpenXR Oculus](https://install.appcenter.ms/orgs/inseye/apps/inseye-calibration-openxr-quest/distribution_groups/inseye%20public)
+  - [Inseye Calibration FlatScreen](https://install.appcenter.ms/orgs/inseye/apps/inseye-calibration-flat-screen/distribution_groups/inseye%20public)
+
+Please ensure these components are installed and running on the device.
 
 ## Installation
 
@@ -24,19 +37,6 @@ dependencies {
     implementation 'com.inseye.sdk:inseye-sdk:1.0.0'
 }
 ```
-
-## Requirements
-
-To function properly, the Inseye SDK requires the following components to be installed on the device:
-- Inseye Android Service
-    - [Inseye Android Service STANDARD](https://install.appcenter.ms/orgs/inseye/apps/inseye-service/distribution_groups/inseye%20public) - public version
-    - [Inseye Android Service PRO](https://install.appcenter.ms/orgs/inseye/apps/inseye-service/distribution_groups/inseye%20internal) - internal and for privaledged users version
-- Inseye Calibration - depend on target platform
-  - [Inseye Calibration OpenXR Pico](https://install.appcenter.ms/orgs/inseye/apps/inseye-calibration-openxr-pico/distribution_groups/inseye%20public)
-  - [Inseye Calibration OpenXR Oculus](https://install.appcenter.ms/orgs/inseye/apps/inseye-calibration-openxr-quest/distribution_groups/inseye%20public)
-  - [Inseye Calibration FlatScreen](https://install.appcenter.ms/orgs/inseye/apps/inseye-calibration-flat-screen/distribution_groups/inseye%20public)
-
-Please ensure these components are installed and running on the device.
 
 ## Usage
 
@@ -91,22 +91,6 @@ protected InseyeTracker(ISharedService serviceInterface)
 
 #### Methods
 
-##### `getServiceVersion()`
-
-```java
-public Version getServiceVersion()
-```
-
-Returns the version of the Inseye service.
-
-##### `getFirmwareVersion()`
-
-```java
-public Version getFirmwareVersion()
-```
-
-Returns the version of the eye tracker firmware.
-
 ##### `getTrackerAvailability()`
 
 ```java
@@ -133,22 +117,6 @@ public void unsubscribeFromTrackerStatus()
 
 Unsubscribes from eye tracker status events.
 
-##### `getDominantEye()`
-
-```java
-public Eye getDominantEye()
-```
-
-Returns the dominant eye of the user.
-
-##### `getMostRecentGazeData()`
-
-```java
-public GazeData getMostRecentGazeData()
-```
-
-Returns the most recent gaze data, or `null` if no gaze data is available.
-
 ##### `subscribeToGazeData(GazeDataReader.IGazeData gazeData)`
 
 ```java
@@ -169,6 +137,22 @@ public void unsubscribeFromGazeData()
 
 Unsubscribes from gaze data updates.
 
+##### `startCalibration()`
+
+```java
+public CompletableFuture<ActionResult> startCalibration()
+```
+Starts the built-in calibration procedure. Returns a `CompletableFuture` that completes when the calibration procedure finishes. The result of the future indicates whether the calibration was successful.
+
+
+##### `getDominantEye()`
+
+```java
+public Eye getDominantEye()
+```
+
+Returns the dominant eye of the user.
+
 ##### `abortCalibration()`
 
 ```java
@@ -177,14 +161,24 @@ public void abortCalibration()
 
 Aborts the ongoing calibration procedure.
 
-##### `startCalibration()`
+##### `getServiceVersion()`
 
 ```java
-public CompletableFuture<ActionResult> startCalibration()
+public Version getServiceVersion()
 ```
 
-Starts the built-in calibration procedure. Returns a `CompletableFuture` that completes when the calibration procedure finishes. The result of the future indicates whether the calibration was successful.
+Returns the version of the Inseye service.
+
+##### `getFirmwareVersion()`
+
+```java
+public Version getFirmwareVersion()
+```
+
+Returns the version of the eye tracker firmware.
+
+
 
 ## License
 
-This project is licensed under [place for license]
+License is shared across all sdk components and can be found here: [SDK License](https://github.com/Inseye/Licenses/blob/master/SDKLicense.txt)
