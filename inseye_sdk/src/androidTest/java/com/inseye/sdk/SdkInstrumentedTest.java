@@ -29,6 +29,7 @@ public class SdkInstrumentedTest {
             System.out.println("service: " + eyeTracker.getServiceVersion());
             System.out.println("firmware: " + eyeTracker.getFirmwareVersion());
         } catch (ExecutionException | InterruptedException e) {
+
             System.out.println(e);
         }
     }

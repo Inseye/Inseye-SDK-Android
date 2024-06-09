@@ -13,8 +13,8 @@ import java.util.concurrent.CompletableFuture;
 public class InseyeSDK {
     private static final String TAG = InseyeSDK.class.getSimpleName();
 
-    private final Context context;
     private final InseyeServiceBinder serviceBinder;
+    private InseyeTracker inseyeTracker = null;
 
     /**
      * Constructs a new InseyeSDK instance.
@@ -22,7 +22,6 @@ public class InseyeSDK {
      * @param context The application context.
      */
     public InseyeSDK(Context context) {
-        this.context = context;
         serviceBinder = new InseyeServiceBinder(context);
     }
 
@@ -46,7 +45,8 @@ public class InseyeSDK {
         serviceBinder.bind(new InseyeServiceBinder.IServiceBindCallback() {
             @Override
             public void serviceConnected(ISharedService service) {
-                trackerFuture.complete(new InseyeTracker(service));
+                inseyeTracker = new InseyeTracker(service);
+                trackerFuture.complete(inseyeTracker);
             }
 
             @Override
@@ -63,5 +63,18 @@ public class InseyeSDK {
         });
 
         return trackerFuture;
+    }
+
+    /**
+     Disposes InseyeTracker instance.
+     */
+    public void disposeEyeTracker() {
+        if(inseyeTracker != null) {
+            inseyeTracker.unsubscribeFromTrackerStatus();
+            inseyeTracker.unsubscribeFromGazeData();
+        }
+        serviceBinder.unbind();
+
+
     }
 }

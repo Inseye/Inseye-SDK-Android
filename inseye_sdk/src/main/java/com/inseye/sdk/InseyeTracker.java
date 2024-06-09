@@ -31,6 +31,10 @@ public class InseyeTracker {
     private IServiceBuiltInCalibrationCallback calibrationAbortHandler;
     private GazeDataReader gazeDataReader;
 
+    public interface IEyeTrackerStatusListener {
+        void onTrackerAvailabilityChanged(TrackerAvailability availability);
+    }
+
 
     /**
      * Constructs a new InseyeTracker instance.
@@ -81,11 +85,16 @@ public class InseyeTracker {
     /**
      * Subscribes to eye tracker status events.
      *
-     * @param eventListener The listener to receive eye tracker status events.
+     * @param statusListener The listener to receive eye tracker status events.
      */
-    public void subscribeToTrackerStatus(IEyetrackerEventListener eventListener) {
+    public void subscribeToTrackerStatus(IEyeTrackerStatusListener statusListener) {
         try {
-            serviceInterface.subscribeToEyetrackerEvents(eventListener);
+            serviceInterface.subscribeToEyetrackerEvents(new IEyetrackerEventListener.Stub() {
+                @Override
+                public void handleTrackerAvailabilityChanged(TrackerAvailability availability) throws RemoteException {
+                    statusListener.onTrackerAvailabilityChanged(availability);
+                }
+            });
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }

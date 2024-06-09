@@ -53,7 +53,7 @@ public class InseyeServiceBinder {
 
         // If the service does not exist, trigger the error callback
         if(!serviceExist){
-            inseyeServiceConnection.serviceError(new Exception("inseye service is not present in system"));
+            inseyeServiceConnection.serviceError(new InseyeTrackerException("inseye service is not present in system"));
         }
     }
 
