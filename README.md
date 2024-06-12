@@ -47,7 +47,7 @@ To use the Inseye SDK in your Android project, add the following dependency to y
 
 ```gradle
 dependencies {
-    implementation 'com.github.Inseye.Inseye-SDK-Android:inseye-sdk:TAG'
+    implementation 'com.github.Inseye:Inseye-SDK-Android:TAG'
 }
 ```
 
