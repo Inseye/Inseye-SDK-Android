@@ -30,11 +30,22 @@ Please ensure these components are installed and running on the device.
 
 ## Installation
 
-To use the Inseye SDK in your Android project, add the following dependency to your `build.gradle` file:
+Add it in your root `build.gradle` at the end of repositories:
+```gradle
+dependencyResolutionManagement {
+	repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+	repositories {
+		mavenCentral()
+		maven { url 'https://jitpack.io' }
+	}
+}
+```
+
+To use the Inseye SDK in your Android project, add the following dependency to your target module `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation 'com.inseye.sdk:inseye-sdk:1.0.0'
+    implementation 'com.github.Inseye:Inseye-SDK-Android:TAG'
 }
 ```
 
