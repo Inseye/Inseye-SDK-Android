@@ -15,6 +15,7 @@ The Inseye SDK provides tools for interacting with the Inseye eye tracking servi
 - [Usage](#usage)
   - [InseyeSDK](#inseyesdk)
   - [InseyeTracker](#inseyetracker)
+- [Example](#example)
 - [License](#license)
 
 ## Requirements
@@ -190,6 +191,8 @@ public Version getFirmwareVersion()
 
 Returns the version of the eye tracker firmware.
 
+## Example
+For a complete example of how to integrate and use the Inseye SDK, please visit [Inseye-Android-SDK-Demo](https://github.com/Inseye/Inseye-Android-SDK-Demo)
 
 ## License 
 This repository is part of Inseye Software Development Kit.
