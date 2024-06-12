@@ -1,5 +1,7 @@
+[![](https://jitpack.io/v/Inseye/Inseye-SDK-Android.svg)](https://jitpack.io/#Inseye/Inseye-SDK-Android)
+![](https://img.shields.io/badge/API-27%2B-brightgreen.svg?style=flat)
 
-# Inseye Android SDK Documentation
+# Inseye Android SDK
 
 ## Overview
 
@@ -189,7 +191,7 @@ public Version getFirmwareVersion()
 Returns the version of the eye tracker firmware.
 
 
+# License 
+This repository is part of Inseye Software Development Kit.
 
-## License
-
-License is shared across all sdk components and can be found here: [SDK License](https://github.com/Inseye/Licenses/blob/master/SDKLicense.txt)
+By using content of this repository you agree to [SDK LICENSE](https://github.com/Inseye/Licenses/blob/master/SDKLicense.txt)
