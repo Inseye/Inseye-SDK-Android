@@ -16,8 +16,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 }
+
+
 
 rootProject.name = "Inseye SDK Android"
 include ':inseye_sdk'

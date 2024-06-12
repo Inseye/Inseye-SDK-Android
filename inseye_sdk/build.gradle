@@ -10,9 +10,10 @@ android {
     defaultConfig {
         minSdk 27
         versionCode 1
-        versionName '0.1-alpha'
+        versionName '0.0.1'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+        targetSdk 34
     }
 
     buildTypes {
@@ -46,7 +47,7 @@ publishing {
         create(MavenPublication) {
             groupId = 'com.inseye'
             artifactId = 'inseye-sdk'
-            version = '0.1-alpha'
+            version = '0.0.1-alpha'
 
             // This is the key line
             afterEvaluate {
@@ -64,7 +65,7 @@ publishing {
 
 
 dependencies {
-    implementation project(':inseye_client_api')
+    api project(':inseye_client_api')
     implementation libs.appcompat.v140
     implementation libs.material.v140
     implementation libs.commons.math3
