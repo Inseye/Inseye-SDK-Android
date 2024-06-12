@@ -130,15 +130,15 @@ public void unsubscribeFromTrackerStatus()
 
 Unsubscribes from eye tracker status events.
 
-##### `subscribeToGazeData(GazeDataReader.IGazeData gazeData)`
+##### `subscribeToGazeData(GazeDataReader.IGazeData gazeDataListener)`
 
 ```java
-public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeData) throws InseyeTrackerException
+public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeDataListener) throws InseyeTrackerException
 ```
 
 Subscribes to gaze data updates.
 
-`gazeData` The listener to receive gaze data updates.
+`gazeDataListener` The listener to receive gaze data updates.
 
 Throws an `InseyeTrackerException` if an error occurs while subscribing to gaze data.
 
@@ -191,7 +191,7 @@ public Version getFirmwareVersion()
 Returns the version of the eye tracker firmware.
 
 
-# License 
+## License 
 This repository is part of Inseye Software Development Kit.
 
 By using content of this repository you agree to [SDK LICENSE](https://github.com/Inseye/Licenses/blob/master/SDKLicense.txt)
