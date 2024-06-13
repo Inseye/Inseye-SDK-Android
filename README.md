@@ -24,9 +24,9 @@ The Inseye SDK provides tools for interacting with the Inseye eye tracking servi
 ## Requirements
 
 To function properly, the Inseye SDK requires the following components to be installed on the device:
-- Inseye Android Service - act as centrall hub fo
-	- [Inseye Android Service STANDARD](https://install.appcenter.ms/orgs/inseye/apps/inseye-service/distribution_groups/inseye%20public) - public version with only necessary options exposed
-	- [Inseye Android Service PRO](https://install.appcenter.ms/orgs/inseye/apps/inseye-service/distribution_groups/inseye%20internal) - for internal and privileged users. Requires access to be granted by Inseye 
+- Inseye Android Service
+	- [Inseye Android Service](https://install.appcenter.ms/orgs/inseye/apps/inseye-service/distribution_groups/inseye%20public) - public version
+	- [Inseye Android Service PRO](https://install.appcenter.ms/orgs/inseye/apps/inseye-service/distribution_groups/inseye%20internal) - for internal and privileged users. Exposes additional settings. Requires access to be granted by Inseye 
 - Inseye Calibration - depends on target platform
 	- [Inseye Calibration OpenXR Pico](https://install.appcenter.ms/orgs/inseye/apps/inseye-calibration-openxr-pico/distribution_groups/inseye%20public)
   	- [Inseye Calibration OpenXR Oculus](https://install.appcenter.ms/orgs/inseye/apps/inseye-calibration-openxr-quest/distribution_groups/inseye%20public)
