@@ -120,7 +120,7 @@ public class TestActivity extends AppCompatActivity implements GazeDataReader.IG
         float avgGazeX = (gazeData.left_x + gazeData.right_x) / 2f;
         float avgGazeY = (gazeData.left_y + gazeData.right_y) / 2f;
         // gaze data in radians where (0,0) is in screen center
-        redPointView.post(()-> redPointView.setPoint(avgGazeX, avgGazeY));
+        redPointView.post(()-> redPointView.setPoint(avgGazeX, avgGazeY, this));
     }
 
     @Override
