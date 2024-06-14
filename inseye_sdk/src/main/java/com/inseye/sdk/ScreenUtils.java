@@ -1,6 +1,7 @@
 package com.inseye.sdk;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
@@ -15,28 +16,14 @@ public class ScreenUtils {
     private static final double VERTICAL_HALF_ANGLE_RANGE_RAD = Math.toRadians(VERTICAL_HALF_ANGLE_RANGE_DEG);
 
     /**
-     * Retrieves the screen size in pixels for the given context.
-     *
-     * @param context the application context
-     * @return a DisplayMetrics object containing the screen size information
-     */
-    public static DisplayMetrics getScreenSize(Context context) {
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
-        return displayMetrics;
-    }
-
-    /**
      * Converts angles (in radians) to screen space coordinates.
      *
      * @param angleX the horizontal angle in radians
      * @param angleY the vertical angle in radians
-     * @param context the application context
      * @return a Vector2D object containing the screen space coordinates
      */
-    public static Vector2D angleToScreenSpace(float angleX, float angleY, Context context) {
-        DisplayMetrics metrics = getScreenSize(context);
+    public static Vector2D angleToScreenSpace(float angleX, float angleY) {
+        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
         int width = metrics.widthPixels;
         int height = metrics.heightPixels;
 
