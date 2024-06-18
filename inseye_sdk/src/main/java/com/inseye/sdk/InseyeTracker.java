@@ -15,6 +15,7 @@ import com.inseye.shared.communication.ISharedService;
 import com.inseye.shared.communication.IntActionResult;
 import com.inseye.shared.communication.Version;
 import com.inseye.shared.communication.TrackerAvailability;
+import com.inseye.shared.communication.VisibleFov;
 
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -28,6 +29,8 @@ public class InseyeTracker {
     private final ISharedService serviceInterface;
     private final Version serviceVersion = new Version();
     private final Version firmwareVersion = new Version();
+    private final Version calibrationVersion = new Version();
+
     private IServiceBuiltInCalibrationCallback calibrationAbortHandler;
     private GazeDataReader gazeDataReader;
 
@@ -44,7 +47,7 @@ public class InseyeTracker {
     protected InseyeTracker(ISharedService serviceInterface) {
         this.serviceInterface = serviceInterface;
         try {
-            serviceInterface.getVersions(serviceVersion, firmwareVersion);
+            serviceInterface.getVersions(serviceVersion, firmwareVersion, calibrationVersion);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -57,6 +60,15 @@ public class InseyeTracker {
      */
     public Version getServiceVersion() {
         return serviceVersion;
+    }
+
+    /**
+     * Returns the version of the Inseye calibration.
+     *
+     * @return The calibration version.
+     */
+    public Version getCalibrationVersion() {
+        return calibrationVersion;
     }
 
     /**
@@ -125,6 +137,19 @@ public class InseyeTracker {
     }
 
     /**
+     * Visible field of view on VR headset or view port size in AR device
+     *
+     * @return horizontal and vertical fov in degrees angle.
+     */
+   public VisibleFov getVisibleFov() {
+       try {
+           return serviceInterface.getVisibleFov();
+       } catch (RemoteException e) {
+           throw new RuntimeException(e);
+       }
+   }
+
+    /**
      * Returns the most recent gaze data.
      *
      * @return The most recent gaze data, or null if no gaze data is available.
@@ -171,16 +196,6 @@ public class InseyeTracker {
         }
     }
 
-    /**
-     * Aborts the ongoing calibration procedure.
-     */
-    public void abortCalibration() {
-        try {
-            if(calibrationAbortHandler != null) calibrationAbortHandler.abortCalibrationProcedure();
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     /**
      * Starts the built-in calibration procedure.
@@ -220,5 +235,16 @@ public class InseyeTracker {
         // add timeout
 
         return calibrationFuture;
+    }
+
+    /**
+     * Aborts the ongoing calibration procedure.
+     */
+    public void abortCalibration() {
+        try {
+            if(calibrationAbortHandler != null) calibrationAbortHandler.abortCalibrationProcedure();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

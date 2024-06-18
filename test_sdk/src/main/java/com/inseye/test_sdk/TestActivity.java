@@ -99,8 +99,12 @@ public class TestActivity extends AppCompatActivity implements GazeDataReader.IG
                 });
 
                 unsubGazeDataButton.setOnClickListener(v -> insEyeTracker.unsubscribeFromGazeData());
+                Toast.makeText(this, insEyeTracker.getVisibleFov().toString(), Toast.LENGTH_SHORT).show();
 
-                }).exceptionally(throwable -> {
+                Toast.makeText(this, insEyeTracker.getCalibrationVersion().toString(), Toast.LENGTH_SHORT).show();
+
+
+            }).exceptionally(throwable -> {
                 Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e(TAG, throwable.getMessage());
                 return null;
