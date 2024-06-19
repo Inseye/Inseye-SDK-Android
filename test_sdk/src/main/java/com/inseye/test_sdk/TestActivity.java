@@ -17,18 +17,25 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.inseye.sdk.GazeDataExtension;
 import com.inseye.sdk.GazeDataReader;
 import com.inseye.sdk.InseyeTracker;
 import com.inseye.sdk.InseyeSDK;
 import com.inseye.sdk.InseyeTrackerException;
 import com.inseye.sdk.RedPointView;
+import com.inseye.sdk.ScreenUtils;
 import com.inseye.shared.communication.GazeData;
 import com.inseye.shared.communication.TrackerAvailability;
+
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import lombok.experimental.ExtensionMethod;
+
+@ExtensionMethod({GazeDataExtension.class})
 public class TestActivity extends AppCompatActivity implements GazeDataReader.IGazeData, InseyeTracker.IEyeTrackerStatusListener {
 
     private static final String TAG = TestActivity.class.getSimpleName();
@@ -39,6 +46,8 @@ public class TestActivity extends AppCompatActivity implements GazeDataReader.IG
     private final Handler mainLooperHandler = new Handler(Looper.getMainLooper());
 
     private InseyeSDK inseyeSDK;
+    private InseyeTracker inseyeTracker;
+    private ScreenUtils screenUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,46 +78,31 @@ public class TestActivity extends AppCompatActivity implements GazeDataReader.IG
 
         inseyeSDK = new InseyeSDK(this);
 
-//        InseyeTracker eyeTracker = null;
-//        try {
-//            eyeTracker = inseyeSDK.getEyeTracker().get();
-//        } catch (ExecutionException | InterruptedException e) {
-//            Log.e(TAG, e.getMessage());
-//            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-//        }
-
-//        if(eyeTracker != null && inseyeSDK.isServiceConnected()) {
-
-            inseyeSDK.getEyeTracker().thenAccept(insEyeTracker -> {
-                statusTextView.setText(insEyeTracker.getTrackerAvailability().name());
-
-                insEyeTracker.subscribeToTrackerStatus(this);
-
-                calibrateButton.setOnClickListener(v -> {
-                    insEyeTracker.startCalibration().thenAccept(result -> {
-                        Toast.makeText(this, result.toString(), Toast.LENGTH_SHORT).show();
-                    });
+        inseyeSDK.getEyeTracker().thenAccept(insEyeTracker -> {
+            this.inseyeTracker = insEyeTracker;
+            this.screenUtils = insEyeTracker.getScreenUtils();
+            statusTextView.setText(insEyeTracker.getTrackerAvailability().name());
+            insEyeTracker.subscribeToTrackerStatus(this);
+            calibrateButton.setOnClickListener(v -> {
+                insEyeTracker.startCalibration().thenAccept(result -> {
+                    Toast.makeText(this, result.toString(), Toast.LENGTH_SHORT).show();
                 });
-
-                subGazeDataButton.setOnClickListener(v -> {
-                    try {
-                        insEyeTracker.subscribeToGazeData(this);
-                    } catch (InseyeTrackerException e) {
-                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                unsubGazeDataButton.setOnClickListener(v -> insEyeTracker.unsubscribeFromGazeData());
-                Toast.makeText(this, insEyeTracker.getVisibleFov().toString(), Toast.LENGTH_SHORT).show();
-
-                Toast.makeText(this, insEyeTracker.getCalibrationVersion().toString(), Toast.LENGTH_SHORT).show();
-
-
-            }).exceptionally(throwable -> {
-                Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e(TAG, throwable.getMessage());
-                return null;
             });
+            subGazeDataButton.setOnClickListener(v -> {
+                try {
+                    insEyeTracker.subscribeToGazeData(this);
+                } catch (InseyeTrackerException e) {
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            unsubGazeDataButton.setOnClickListener(v -> insEyeTracker.unsubscribeFromGazeData());
+            Toast.makeText(this, insEyeTracker.getVisibleFov().toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, insEyeTracker.getCalibrationVersion().toString(), Toast.LENGTH_SHORT).show();
+        }).exceptionally(throwable -> {
+            Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, throwable.getMessage());
+            return null;
+        });
     }
 
     @Override
@@ -118,13 +112,21 @@ public class TestActivity extends AppCompatActivity implements GazeDataReader.IG
     }
 
     @Override
+    protected void onResume() {
+        if(inseyeSDK.isServiceConnected())
+            statusTextView.setText(inseyeTracker.getTrackerAvailability().name());
+
+        super.onResume();
+    }
+
+    @Override
     public void nextGazeDataReady(GazeData gazeData) {
         mainLooperHandler.post(() -> gazeDataTextView.setText(String.format("Left Eye:   X:%6.2f Y:%6.2f\nRight Eye: X:%6.2f Y:%6.2f\nEvent: %s\nTime: %d",
                 gazeData.left_x, gazeData.left_y, gazeData.right_x, gazeData.right_y, gazeData.event, gazeData.timeMilli)));
-        float avgGazeX = (gazeData.left_x + gazeData.right_x) / 2f;
-        float avgGazeY = (gazeData.left_y + gazeData.right_y) / 2f;
-        // gaze data in radians where (0,0) is in screen center
-        redPointView.post(()-> redPointView.setPoint(avgGazeX, avgGazeY));
+
+        Vector2D gazeMidPoint = GazeDataExtension.getGazeCombined(gazeData);
+        Vector2D gazeViewSpace = screenUtils.angleToViewSpace(gazeMidPoint, redPointView);
+        redPointView.post(() -> redPointView.setPoint(gazeViewSpace));
     }
 
     @Override

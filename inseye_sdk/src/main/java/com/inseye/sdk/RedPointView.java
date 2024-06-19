@@ -43,9 +43,8 @@ public class RedPointView extends View {
         canvas.drawCircle((float) redPoint.getX(), (float) redPoint.getY(), 20, paint);
     }
 
-    public void setPoint(float angleX, float angleY) {
-        Vector2D screenPoint = ScreenUtils.angleToScreenSpace(angleX, angleY);
-        this.redPoint = ScreenUtils.screenSpaceToViewSpace(this, screenPoint);
+    public void setPoint(Vector2D position) {
+        this.redPoint = position;
         invalidate(); // Request to redraw the view
     }
 

@@ -16,13 +16,18 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import lombok.Getter;
 
 public class GazeDataReader extends Thread implements Closeable {
 
     private final String TAG = GazeDataReader.class.getName();
     private final DatagramSocket socket;
     private final ByteBuffer byteBuffer;
+    // Method to get the gaze buffer queue
+    @Getter
     private final LinkedBlockingQueue<GazeData> gazeBuffer;
     private final IGazeData gazeInterface;
 
@@ -51,14 +56,12 @@ public class GazeDataReader extends Thread implements Closeable {
         super.setName(GazeDataReader.class.getSimpleName());
     }
 
-    // Method to get the gaze buffer queue
-    public LinkedBlockingQueue<GazeData> getGazeBuffer() {
-        return gazeBuffer;
-    }
-
+    // Method to get the most recent gaze data packet
     public GazeData getMostRecentGazeData() {
         return gazeBuffer.peek();
     }
+
+
 
     // Main method to run the thread and process incoming gaze data packets
     @Override

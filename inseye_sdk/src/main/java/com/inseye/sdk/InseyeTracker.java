@@ -4,6 +4,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.inseye.shared.communication.ActionResult;
 import com.inseye.shared.communication.Eye;
@@ -21,17 +22,38 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.concurrent.CompletableFuture;
 
+import lombok.Getter;
+
 /**
  * The main class for interacting with the Inseye eye tracker.
  */
 public class InseyeTracker {
     private static final String TAG = InseyeTracker.class.getSimpleName();
-    private final ISharedService serviceInterface;
+    /**
+     *  Returns the version of the Inseye service.
+     */
+    @Getter
     private final Version serviceVersion = new Version();
+    /**
+     *  Returns the version of the eye tracker firmware.
+     */
+    @Getter
     private final Version firmwareVersion = new Version();
+    /**
+     *  Returns the version of the Inseye calibration.
+     */
+    @Getter
     private final Version calibrationVersion = new Version();
 
+
+    /**
+     * Returns the screen space utils for the Inseye tracker.
+     */
+    @Getter
+    private final ScreenUtils screenUtils;
+
     private IServiceBuiltInCalibrationCallback calibrationAbortHandler;
+    private final ISharedService serviceInterface;
     private GazeDataReader gazeDataReader;
 
     public interface IEyeTrackerStatusListener {
@@ -51,33 +73,7 @@ public class InseyeTracker {
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Returns the version of the Inseye service.
-     *
-     * @return The service version.
-     */
-    public Version getServiceVersion() {
-        return serviceVersion;
-    }
-
-    /**
-     * Returns the version of the Inseye calibration.
-     *
-     * @return The calibration version.
-     */
-    public Version getCalibrationVersion() {
-        return calibrationVersion;
-    }
-
-    /**
-     * Returns the version of the eye tracker firmware.
-     *
-     * @return The firmware version.
-     */
-    public Version getFirmwareVersion(){
-        return firmwareVersion;
+        screenUtils = new ScreenUtils(getVisibleFov());
     }
 
     /**
@@ -149,13 +145,14 @@ public class InseyeTracker {
        }
    }
 
+
     /**
      * Returns the most recent gaze data.
      *
-     * @return The most recent gaze data, or null if no gaze data is available.
+     * @return @Nullable The most recent gaze data, or null if no gaze data is available.
      */
     public GazeData getMostRecentGazeData() {
-        return null; // TODO: Implement this method to return the most recent gaze data.
+        return gazeDataReader.getMostRecentGazeData();
     }
 
 

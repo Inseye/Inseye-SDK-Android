@@ -36,6 +36,7 @@ dependencies {
     implementation libs.constraintlayout
     implementation project(':inseye_sdk')
     implementation project(':inseye_client_api')
+    implementation libs.projectlombok.lombok
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
