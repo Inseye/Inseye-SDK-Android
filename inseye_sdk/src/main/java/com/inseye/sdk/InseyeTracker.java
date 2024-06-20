@@ -168,9 +168,10 @@ public class InseyeTracker {
             if(result.success) {
                 int udpPort = result.value;
                 Log.i(TAG, "port:" + udpPort);
-                gazeDataReader = new GazeDataReader(udpPort, gazeData);
-                gazeDataReader.start();
-            } else {
+                if(gazeDataReader == null || gazeDataReader.isInterrupted()) {
+                    gazeDataReader = new GazeDataReader(udpPort, gazeData);
+                    gazeDataReader.start();
+                }            } else {
                 Log.e(TAG, "gaze stream error: " + result.errorMessage);
                 throw new InseyeTrackerException(result.errorMessage);
             }
@@ -187,7 +188,7 @@ public class InseyeTracker {
     public void unsubscribeFromGazeData() {
         try {
             serviceInterface.stopStreamingGazeData();
-            gazeDataReader.interrupt();
+            if(gazeDataReader != null) gazeDataReader.interrupt();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -244,4 +245,8 @@ public class InseyeTracker {
             throw new RuntimeException(e);
         }
     }
+
+
+
+
 }

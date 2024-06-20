@@ -1,32 +1,31 @@
-package com.inseye.sdk;
+package com.inseye.test_sdk;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
-public class RedPointView extends View {
+public class OverlayRedPointView extends FrameLayout {
 
-    private Vector2D redPoint = new Vector2D(0,0);
+    private Vector2D redPoint = new Vector2D(0, 0);
     private Paint paint;
 
-
-    public RedPointView(Context context) {
+    public OverlayRedPointView(Context context) {
         super(context);
         init();
     }
 
-    public RedPointView(Context context, AttributeSet attrs) {
+    public OverlayRedPointView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public RedPointView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public OverlayRedPointView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
@@ -35,11 +34,12 @@ public class RedPointView extends View {
         paint = new Paint();
         paint.setColor(0xFFFF0000); // Red color
         paint.setStyle(Paint.Style.FILL);
+        setWillNotDraw(false); // This is important to ensure that onDraw gets called
     }
 
     @Override
-    protected void onDraw(@NonNull Canvas canvas) {
-        super.onDraw(canvas);
+    protected void dispatchDraw(@NonNull Canvas canvas) {
+        super.dispatchDraw(canvas);
         canvas.drawCircle((float) redPoint.getX(), (float) redPoint.getY(), 20, paint);
     }
 
@@ -47,7 +47,4 @@ public class RedPointView extends View {
         this.redPoint = position;
         invalidate(); // Request to redraw the view
     }
-
-
-
 }

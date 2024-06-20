@@ -74,7 +74,7 @@ public class InseyeSDK {
     /**
      Disposes InseyeTracker instance.
      */
-    public void disposeEyeTracker() {
+    public void dispose() {
         if(inseyeTracker != null) {
             inseyeTracker.unsubscribeFromTrackerStatus();
             inseyeTracker.unsubscribeFromGazeData();
