@@ -35,7 +35,6 @@ public class TestActivity extends AppCompatActivity implements GazeDataReader.IG
     private TextView statusTextView, gazeDataTextView, additionalInfoTextView;
     private Button calibrateButton, subGazeDataButton, unsubGazeDataButton;
     private OverlayRedPointView redPointView;
-    private Choreographer.FrameCallback frameCallback;
 
     private InseyeSDK inseyeSDK;
     private InseyeTracker inseyeTracker;
@@ -69,7 +68,7 @@ public class TestActivity extends AppCompatActivity implements GazeDataReader.IG
         inseyeSDK.getEyeTracker().thenAccept(insEyeTracker -> {
             this.inseyeTracker = insEyeTracker;
             this.screenUtils = insEyeTracker.getScreenUtils();
-            statusTextView.setText("Status: " + insEyeTracker.getTrackerAvailability().name());
+            statusTextView.setText(String.format("Status: %s", insEyeTracker.getTrackerAvailability().name()));
 
             UpdateAdditionalInfo();
 
@@ -82,14 +81,15 @@ public class TestActivity extends AppCompatActivity implements GazeDataReader.IG
 
             subGazeDataButton.setOnClickListener(v -> {
                 try {
-                    Choreographer.getInstance().postFrameCallback(frameCallback);
-
+                    insEyeTracker.startStreamingGazeData();
                     insEyeTracker.subscribeToGazeData(this);
                 } catch (InseyeTrackerException e) {
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-            unsubGazeDataButton.setOnClickListener(v -> insEyeTracker.unsubscribeFromGazeData());
+            unsubGazeDataButton.setOnClickListener(v -> {
+                insEyeTracker.stopStreamingGazeData();
+                insEyeTracker.unsubscribeFromGazeData(this);});
 
 
         }).exceptionally(throwable -> {
@@ -97,19 +97,6 @@ public class TestActivity extends AppCompatActivity implements GazeDataReader.IG
             Log.e(TAG, throwable.getMessage());
             return null;
         });
-
-        frameCallback = frameTimeNanos -> {
-            GazeData gazeData = inseyeTracker.getMostRecentGazeData();
-            if (inseyeTracker.getTrackerAvailability() == TrackerAvailability.Available && gazeData != null) {
-                Vector2D gazeMidPoint = GazeDataExtension.getGazeCombined(gazeData);
-                Vector2D gazeViewSpace = screenUtils.angleToViewSpace(gazeMidPoint, redPointView);
-                redPointView.setPoint(gazeViewSpace);
-            }
-            Choreographer.getInstance().postFrameCallback(frameCallback);
-        };
-
-
-
     }
 
     private void UpdateAdditionalInfo() {
@@ -124,18 +111,10 @@ public class TestActivity extends AppCompatActivity implements GazeDataReader.IG
     }
 
     @Override
-    protected void onPause() {
-        Choreographer.getInstance().removeFrameCallback(frameCallback);
-        super.onPause();
-    }
-
-
-    @Override
     protected void onResume() {
         if(inseyeSDK.isServiceConnected()) {
-            statusTextView.setText(inseyeTracker.getTrackerAvailability().name());
+            statusTextView.setText(String.format("Status: %s", inseyeTracker.getTrackerAvailability().name()));
             UpdateAdditionalInfo();
-            Choreographer.getInstance().postFrameCallback(frameCallback);
         }
         super.onResume();
     }
@@ -144,10 +123,13 @@ public class TestActivity extends AppCompatActivity implements GazeDataReader.IG
     public void nextGazeDataReady(GazeData gazeData) {
         gazeDataTextView.post(() -> gazeDataTextView.setText(String.format("Gaze Data\n\nLeft Eye:   X:%6.2f Y:%6.2f\nRight Eye:   X:%6.2f Y:%6.2f\nEvent: %s\nTime: %d",
                 gazeData.left_x, gazeData.left_y, gazeData.right_x, gazeData.right_y, gazeData.event, gazeData.timeMilli)));
+        Vector2D gazeMidPoint = GazeDataExtension.getGazeCombined(gazeData);
+        Vector2D gazeViewSpace = screenUtils.angleToViewSpace(gazeMidPoint, redPointView);
+        redPointView.post(() -> redPointView.setPoint(gazeViewSpace));
     }
 
     @Override
     public void onTrackerAvailabilityChanged(TrackerAvailability availability) {
-        statusTextView.post(() -> statusTextView.setText(availability.name()));
+        statusTextView.post(() -> statusTextView.setText(String.format("Status: %s", availability.name())));
     }
 }

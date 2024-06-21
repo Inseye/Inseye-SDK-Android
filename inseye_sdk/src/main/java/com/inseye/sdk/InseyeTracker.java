@@ -152,50 +152,70 @@ public class InseyeTracker {
      * @return @Nullable The most recent gaze data, or null if no gaze data is available.
      */
     public GazeData getMostRecentGazeData() {
-        return gazeDataReader.getMostRecentGazeData();
+        if(gazeDataReader != null ) return gazeDataReader.getMostRecentGazeData();
+        else return null;
     }
 
 
     /**
      * Subscribes to gaze data updates.
      *
-     * @param gazeData The listener to receive gaze data updates.
-     * @throws InseyeTrackerException If an error occurs while subscribing to gaze data.
+     * @param gazeListener The listener to receive gaze data updates.
      */
-    public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeData) throws InseyeTrackerException {
+    public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeListener)  {
+        if(gazeDataReader != null) {
+            gazeDataReader.addGazeListener(gazeListener);
+        }
+
+    }
+
+    /**
+     * Unsubscribes from gaze data updates.
+     * @param gazeListener The listener to stop receiving gaze data updates.
+     */
+    public void unsubscribeFromGazeData(@NonNull GazeDataReader.IGazeData gazeListener) {
+        if(gazeDataReader != null) {
+            gazeDataReader.removeGazeListener(gazeListener);
+        }
+    }
+
+    /**
+     * Starts streaming gaze data.
+     * @throws InseyeTrackerException if gaze data streaming fails.
+     */
+    public void startStreamingGazeData() throws InseyeTrackerException {
         try {
             IntActionResult result = serviceInterface.startStreamingGazeData();
             if(result.success) {
                 int udpPort = result.value;
                 Log.i(TAG, "port:" + udpPort);
                 if(gazeDataReader == null || gazeDataReader.isInterrupted()) {
-                    gazeDataReader = new GazeDataReader(udpPort, gazeData);
+                    gazeDataReader = new GazeDataReader(udpPort);
                     gazeDataReader.start();
-                }            } else {
+                }
+            } else {
                 Log.e(TAG, "gaze stream error: " + result.errorMessage);
                 throw new InseyeTrackerException(result.errorMessage);
             }
-
-        } catch (RemoteException | SocketException | UnknownHostException e) {
-            Log.e(TAG, e.toString());
+        } catch (RemoteException | UnknownHostException | SocketException e) {
             throw new InseyeTrackerException(e);
+
         }
     }
 
     /**
-     * Unsubscribes from gaze data updates.
+     * Stops streaming gaze data.
      */
-    public void unsubscribeFromGazeData() {
+    public void stopStreamingGazeData() {
         try {
             serviceInterface.stopStreamingGazeData();
-            if(gazeDataReader != null) gazeDataReader.interrupt();
+            if (gazeDataReader != null) gazeDataReader.interrupt();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
 
-
-    /**
+        /**
      * Starts the built-in calibration procedure.
      *
      * @return A CompletableFuture that completes when the calibration procedure finishes.

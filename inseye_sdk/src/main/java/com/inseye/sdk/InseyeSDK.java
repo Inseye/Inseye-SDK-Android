@@ -77,7 +77,7 @@ public class InseyeSDK {
     public void dispose() {
         if(inseyeTracker != null) {
             inseyeTracker.unsubscribeFromTrackerStatus();
-            inseyeTracker.unsubscribeFromGazeData();
+            inseyeTracker.stopStreamingGazeData();
         }
         serviceBinder.unbind();
 
