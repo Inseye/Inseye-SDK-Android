@@ -9,8 +9,6 @@ android {
 
     defaultConfig {
         minSdk 27
-        versionCode 2
-        versionName '0.0.5'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         targetSdk 34
@@ -28,7 +26,6 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-
     publishing {
         singleVariant('release') {
             withSourcesJar()
@@ -43,14 +40,14 @@ android {
     }
 }
 
-
-
-
 dependencies {
     api project(':inseye_client_api')
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
     implementation libs.appcompat.v140
     implementation libs.material.v140
-    implementation libs.commons.math3
+    api libs.commons.math3
     testImplementation libs.junit
     androidTestImplementation libs.junit.v113
     androidTestImplementation libs.espresso.core.v340
@@ -62,7 +59,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'com.inseye'
             artifactId = 'inseye-sdk'
-            version = '0.0.5'
+            version = '1.0.0'
 
             afterEvaluate {
                 from components.release

@@ -4,6 +4,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.inseye.shared.communication.ActionResult;
 import com.inseye.shared.communication.Eye;
@@ -15,20 +16,44 @@ import com.inseye.shared.communication.ISharedService;
 import com.inseye.shared.communication.IntActionResult;
 import com.inseye.shared.communication.Version;
 import com.inseye.shared.communication.TrackerAvailability;
+import com.inseye.shared.communication.VisibleFov;
 
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.concurrent.CompletableFuture;
+
+import lombok.Getter;
 
 /**
  * The main class for interacting with the Inseye eye tracker.
  */
 public class InseyeTracker {
     private static final String TAG = InseyeTracker.class.getSimpleName();
-    private final ISharedService serviceInterface;
+    /**
+     *  Returns the version of the Inseye service.
+     */
+    @Getter
     private final Version serviceVersion = new Version();
+    /**
+     *  Returns the version of the eye tracker firmware.
+     */
+    @Getter
     private final Version firmwareVersion = new Version();
+    /**
+     *  Returns the version of the Inseye calibration.
+     */
+    @Getter
+    private final Version calibrationVersion = new Version();
+
+
+    /**
+     * Returns the screen space utils for the Inseye tracker.
+     */
+    @Getter
+    private final ScreenUtils screenUtils;
+
     private IServiceBuiltInCalibrationCallback calibrationAbortHandler;
+    private final ISharedService serviceInterface;
     private GazeDataReader gazeDataReader;
 
     public interface IEyeTrackerStatusListener {
@@ -44,28 +69,11 @@ public class InseyeTracker {
     protected InseyeTracker(ISharedService serviceInterface) {
         this.serviceInterface = serviceInterface;
         try {
-            serviceInterface.getVersions(serviceVersion, firmwareVersion);
+            serviceInterface.getVersions(serviceVersion, firmwareVersion, calibrationVersion);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Returns the version of the Inseye service.
-     *
-     * @return The service version.
-     */
-    public Version getServiceVersion() {
-        return serviceVersion;
-    }
-
-    /**
-     * Returns the version of the eye tracker firmware.
-     *
-     * @return The firmware version.
-     */
-    public Version getFirmwareVersion(){
-        return firmwareVersion;
+        screenUtils = new ScreenUtils(getVisibleFov());
     }
 
     /**
@@ -125,64 +133,89 @@ public class InseyeTracker {
     }
 
     /**
+     * Visible field of view on VR headset or view port size in AR device
+     *
+     * @return horizontal and vertical fov in degrees angle.
+     */
+   public VisibleFov getVisibleFov() {
+       try {
+           return serviceInterface.getVisibleFov();
+       } catch (RemoteException e) {
+           throw new RuntimeException(e);
+       }
+   }
+
+
+    /**
      * Returns the most recent gaze data.
      *
-     * @return The most recent gaze data, or null if no gaze data is available.
+     * @return @Nullable The most recent gaze data, or null if no gaze data is available.
      */
     public GazeData getMostRecentGazeData() {
-        return null; // TODO: Implement this method to return the most recent gaze data.
+        if(gazeDataReader != null ) return gazeDataReader.getMostRecentGazeData();
+        else return null;
     }
 
 
     /**
      * Subscribes to gaze data updates.
      *
-     * @param gazeData The listener to receive gaze data updates.
-     * @throws InseyeTrackerException If an error occurs while subscribing to gaze data.
+     * @param gazeListener The listener to receive gaze data updates.
      */
-    public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeData) throws InseyeTrackerException {
+    public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeListener)  {
+        if(gazeDataReader != null) {
+            gazeDataReader.addGazeListener(gazeListener);
+        }
+
+    }
+
+    /**
+     * Unsubscribes from gaze data updates.
+     * @param gazeListener The listener to stop receiving gaze data updates.
+     */
+    public void unsubscribeFromGazeData(@NonNull GazeDataReader.IGazeData gazeListener) {
+        if(gazeDataReader != null) {
+            gazeDataReader.removeGazeListener(gazeListener);
+        }
+    }
+
+    /**
+     * Starts streaming gaze data.
+     * @throws InseyeTrackerException if gaze data streaming fails.
+     */
+    public void startStreamingGazeData() throws InseyeTrackerException {
         try {
             IntActionResult result = serviceInterface.startStreamingGazeData();
             if(result.success) {
                 int udpPort = result.value;
                 Log.i(TAG, "port:" + udpPort);
-                gazeDataReader = new GazeDataReader(udpPort, gazeData);
-                gazeDataReader.start();
+                if(gazeDataReader == null || gazeDataReader.isInterrupted()) {
+                    gazeDataReader = new GazeDataReader(udpPort);
+                    gazeDataReader.start();
+                }
             } else {
                 Log.e(TAG, "gaze stream error: " + result.errorMessage);
                 throw new InseyeTrackerException(result.errorMessage);
             }
-
-        } catch (RemoteException | SocketException | UnknownHostException e) {
-            Log.e(TAG, e.toString());
+        } catch (RemoteException | UnknownHostException | SocketException e) {
             throw new InseyeTrackerException(e);
+
         }
     }
 
     /**
-     * Unsubscribes from gaze data updates.
+     * Stops streaming gaze data.
      */
-    public void unsubscribeFromGazeData() {
+    public void stopStreamingGazeData() {
         try {
             serviceInterface.stopStreamingGazeData();
-            gazeDataReader.interrupt();
+            if (gazeDataReader != null) gazeDataReader.interrupt();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
 
-    /**
-     * Aborts the ongoing calibration procedure.
-     */
-    public void abortCalibration() {
-        try {
-            if(calibrationAbortHandler != null) calibrationAbortHandler.abortCalibrationProcedure();
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
+        /**
      * Starts the built-in calibration procedure.
      *
      * @return A CompletableFuture that completes when the calibration procedure finishes.
@@ -221,4 +254,19 @@ public class InseyeTracker {
 
         return calibrationFuture;
     }
+
+    /**
+     * Aborts the ongoing calibration procedure.
+     */
+    public void abortCalibration() {
+        try {
+            if(calibrationAbortHandler != null) calibrationAbortHandler.abortCalibrationProcedure();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+
 }

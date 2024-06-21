@@ -16,25 +16,34 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import lombok.Getter;
 
 public class GazeDataReader extends Thread implements Closeable {
 
     private final String TAG = GazeDataReader.class.getName();
     private final DatagramSocket socket;
     private final ByteBuffer byteBuffer;
+    @Getter
     private final LinkedBlockingQueue<GazeData> gazeBuffer;
-    private final IGazeData gazeInterface;
+    private final CopyOnWriteArrayList<IGazeData> gazeInterfaces;
 
     // Interface to provide a callback for when new gaze data is ready
     public interface IGazeData {
         void nextGazeDataReady(GazeData gazeData);
     }
 
-    // Constructor to initialize GazeDataReader with a port and an optional callback
-    public GazeDataReader(int port, @Nullable IGazeData gazeCallback) throws SocketException, UnknownHostException {
-        gazeInterface = gazeCallback;
-
+    /**
+     * Constructor for the GazeDataReader class
+     * @param port The port to bind the socket to
+     * @throws SocketException
+     * @throws UnknownHostException
+     */
+    public GazeDataReader(int port) throws SocketException, UnknownHostException {
+        gazeInterfaces = new CopyOnWriteArrayList<>();
         // Initialize ByteBuffer with appropriate size and byte order
         byte[] array = new byte[GazeData.SERIALIZER.getSizeInBytes()];
         byteBuffer = ByteBuffer.wrap(array, 0, GazeData.SERIALIZER.getSizeInBytes()).order(ByteOrder.LITTLE_ENDIAN);
@@ -51,11 +60,26 @@ public class GazeDataReader extends Thread implements Closeable {
         super.setName(GazeDataReader.class.getSimpleName());
     }
 
-    // Method to get the gaze buffer queue
-    public LinkedBlockingQueue<GazeData> getGazeBuffer() {
-        return gazeBuffer;
+    /**
+     * Add a listener to receive gaze data updates
+     * @param gazeInterface The listener to add
+     */
+    public void addGazeListener(IGazeData gazeInterface) {
+        gazeInterfaces.addIfAbsent(gazeInterface);
     }
 
+    /**
+     * Remove a listener to stop receiving gaze data updates
+     * @param gazeInterface The listener to remove
+     */
+    public void removeGazeListener(IGazeData gazeInterface) {
+        gazeInterfaces.remove(gazeInterface);
+    }
+
+    /**
+     * Get the most recent gaze data packet
+     * @return The most recent gaze data packet
+     */
     public GazeData getMostRecentGazeData() {
         return gazeBuffer.peek();
     }
@@ -78,16 +102,16 @@ public class GazeDataReader extends Thread implements Closeable {
                     gazeBuffer.poll();
                 gazeBuffer.offer(gazeData);
 
-                // If a callback is provided, notify that new data is ready
-                if (gazeInterface != null)
-                    gazeInterface.nextGazeDataReady(gazeData);
+                gazeInterfaces.forEach(x->x.nextGazeDataReady(gazeData));
             } catch (IOException e) {
                 Log.e(TAG, e.toString());
             }
         }
     }
 
-    // Method to close the socket and interrupt the thread
+    /**
+     * Close the socket and interrupt the thread
+     */
     @Override
     public void close() {
         interrupt();

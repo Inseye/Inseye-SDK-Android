@@ -7,6 +7,8 @@ import com.inseye.shared.communication.ISharedService;
 
 import java.util.concurrent.CompletableFuture;
 
+import lombok.Getter;
+
 /**
  * The main entry point for interacting with the Inseye SDK.
  */
@@ -14,6 +16,10 @@ public class InseyeSDK {
     private static final String TAG = InseyeSDK.class.getSimpleName();
 
     private final InseyeServiceBinder serviceBinder;
+    /**
+     * The InseyeTracker instance.
+     */
+    @Getter
     private InseyeTracker inseyeTracker = null;
 
     /**
@@ -68,10 +74,10 @@ public class InseyeSDK {
     /**
      Disposes InseyeTracker instance.
      */
-    public void disposeEyeTracker() {
+    public void dispose() {
         if(inseyeTracker != null) {
             inseyeTracker.unsubscribeFromTrackerStatus();
-            inseyeTracker.unsubscribeFromGazeData();
+            inseyeTracker.stopStreamingGazeData();
         }
         serviceBinder.unbind();
 

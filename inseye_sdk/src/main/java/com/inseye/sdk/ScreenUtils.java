@@ -1,10 +1,10 @@
 package com.inseye.sdk;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.WindowManager;
+
+import com.inseye.shared.communication.VisibleFov;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
@@ -12,27 +12,30 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
  * Utility class for screen-related calculations.
  */
 public class ScreenUtils {
-    private static final double VERTICAL_HALF_ANGLE_RANGE_DEG = 38.4 / 2.;
-    private static final double VERTICAL_HALF_ANGLE_RANGE_RAD = Math.toRadians(VERTICAL_HALF_ANGLE_RANGE_DEG);
+    private final DisplayMetrics displayMetrics;
+    private final double verticalHalfAngleRangeRad;
+
+    protected ScreenUtils(VisibleFov deviceFov) {
+        this.verticalHalfAngleRangeRad = Math.toRadians(deviceFov.vertical / 2f);
+        this.displayMetrics = Resources.getSystem().getDisplayMetrics();
+    }
 
     /**
      * Converts angles (in radians) to screen space coordinates.
      *
-     * @param angleX the horizontal angle in radians
-     * @param angleY the vertical angle in radians
+     * @param gazeAngle2D the 2d angle in radians
      * @return a Vector2D object containing the screen space coordinates
      */
-    public static Vector2D angleToScreenSpace(float angleX, float angleY) {
-        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
-        int width = metrics.widthPixels;
-        int height = metrics.heightPixels;
+    public Vector2D angleToAbsoluteScreenSpace(Vector2D gazeAngle2D) {
+        int width = displayMetrics.widthPixels;
+        int height = displayMetrics.heightPixels;
 
-        double y = height / 2.0 * (1 - angleY / VERTICAL_HALF_ANGLE_RANGE_RAD);
+        double y = height / 2.0 * (1 - gazeAngle2D.getY() / verticalHalfAngleRangeRad);
 
         double aspectRatio = width / (double) height;
-        double horizontalAngleRangeRad = VERTICAL_HALF_ANGLE_RANGE_RAD * aspectRatio;
+        double horizontalAngleRangeRad = verticalHalfAngleRangeRad * aspectRatio;
 
-        double x = width / 2.0 * (1 + angleX / horizontalAngleRangeRad);
+        double x = width / 2.0 * (1 + gazeAngle2D.getX() / horizontalAngleRangeRad);
 
         return new Vector2D(x, y);
     }
@@ -40,13 +43,24 @@ public class ScreenUtils {
     /**
      * Converts screen space coordinates to view space coordinates relative to a given subview.
      *
-     * @param subview the subview relative to which the coordinates are to be calculated
      * @param screenSpace a Vector2D object containing the screen space coordinates
+     * @param view the subview relative to which the coordinates are to be calculated
      * @return a Vector2D object containing the view space coordinates
      */
-    public static Vector2D screenSpaceToViewSpace(View subview, Vector2D screenSpace) {
+    public Vector2D screenSpaceToViewSpace(Vector2D screenSpace, View view) {
         int[] location = new int[2];
-        subview.getLocationOnScreen(location);
+        view.getLocationOnScreen(location);
         return new Vector2D(screenSpace.getX() - location[0], screenSpace.getY() - location[1]);
+    }
+
+    /**
+     * Converts angles (in radians) to screen space coordinates and converts them to view space coordinates.
+     * @param gazeAngle2D the 2d angle in radians
+     * @param view the subview relative to which the coordinates are to be calculated
+     * @return a Vector2D object containing the view space coordinates
+     */
+    public Vector2D angleToViewSpace(Vector2D gazeAngle2D, View view) {
+        Vector2D screenSpace = angleToAbsoluteScreenSpace(gazeAngle2D);
+        return screenSpaceToViewSpace(screenSpace, view);
     }
 }
