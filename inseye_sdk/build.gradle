@@ -25,7 +25,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    
+
     publishing {
         singleVariant('release') {
             withSourcesJar()
@@ -59,7 +59,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'com.inseye'
             artifactId = 'inseye-sdk'
-            version = '0.0.6'
+            version = '1.0.0'
 
             afterEvaluate {
                 from components.release
