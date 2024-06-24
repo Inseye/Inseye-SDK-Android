@@ -6,7 +6,7 @@
 
 ## Overview
 
-The Inseye SDK provides tools for interacting with the Inseye eye tracking service on Android devices. This document provides an overview of the SDK's main classes and their functionalities.
+The Inseye SDK provides tools for interacting with the Inseye eye tracking service on Android devices. This document provides en an overview of the SDK's main classes and their functionalities.
 
 ## Table of Contents
 
@@ -34,9 +34,10 @@ To function properly, the Inseye SDK requires the following components to be ins
 
 Please ensure these components are installed and running on the device.
 
+
 ## Installation
 
-Add it in your root `build.gradle` at the end of repositories:
+Add JitPack repository to your root `build.gradle` at the end of repositories:
 ```gradle
 dependencyResolutionManagement {
 	repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -54,6 +55,7 @@ dependencies {
     implementation 'com.github.Inseye:Inseye-SDK-Android:TAG'
 }
 ```
+Replace `TAG` with latest released version
 
 ## Usage
 
@@ -79,20 +81,26 @@ public boolean isServiceConnected()
 
 Returns `true` if the Inseye service is connected, `false` otherwise.
 
+---
+
 ##### `getEyeTracker()`
 
 ```java
 public CompletableFuture<InseyeTracker> getEyeTracker()
 ```
 
-Asynchronously retrieves an instance of `InseyeTracker`. Returns a `CompletableFuture` that completes with an `InseyeTracker` instance when the service is connected, or completes exceptionally if an error occurs.
+Asynchronously retrieves an instance of [InseyeTracker](#inseyetracker). Returns a `CompletableFuture` that completes with an [InseyeTracker](#inseyetracker) instance when the service is connected, or completes exceptionally if an error occurs.
 
-##### `disposeEyeTracker()`
+---
+
+##### `dispose()`
 
 ```java
-public void disposeEyeTracker()
+public void dispose()
 ```
 Disposes InseyeTracker instance 
+
+---
 
 ### InseyeTracker
 
@@ -107,6 +115,15 @@ public TrackerAvailability getTrackerAvailability()
 ```
 
 Returns the current availability status of the eye tracker.
+###### TrackerAvailability
+- `Available` - eye tracker is connected and ready to start new calibration or streaming gaze data
+- `Disconnected` - eye tracker is disconnected from device
+- `Calibrating` - eye tracker is in the process of calibration
+- `Unavailable` - eye tracker is connected to device but not yet available for use
+- `NotCalibrated` - eye tracker is not calibrated. Device must be calibrated before serving gaze data
+- `Unknown` - the eyetracker is connected but unavailable for unknown reason. his flag should should only appear if client library is behind service library and new flags were added.
+
+---
 
 ##### `subscribeToTrackerStatus(IEyetrackerEventListener eventListener)`
 
@@ -116,7 +133,9 @@ public void subscribeToTrackerStatus(IEyetrackerEventListener eventListener)
 
 Subscribes to eye tracker status events.
 
-`eventListener` The listener to receive eye tracker status events.
+`eventListener` The listener to receive eye tracker status events. It contains callback with [TrackerAvailability](#trackeravailability)
+
+---
 
 ##### `unsubscribeFromTrackerStatus()`
 
@@ -126,17 +145,39 @@ public void unsubscribeFromTrackerStatus()
 
 Unsubscribes from eye tracker status events.
 
+---
+
+##### `startStreamingGazeData()`
+
+``` java
+public void startStreamingGazeData() throws InseyeTrackerException
+```
+
+Starts streaming gaze data. Throws an InseyeTrackerException if gaze data streaming fails.
+
+---
+
+##### `stopStreamingGazeData()`
+
+``` java
+public void stopStreamingGazeData()
+```
+
+Stops streaming gaze data. That means `IEyetrackerEventListener` stops receiving gaze updates and `getMostRecentGazeData()` returns `null`
+
+---
+
 ##### `subscribeToGazeData(GazeDataReader.IGazeData gazeDataListener)`
 
 ```java
-public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeDataListener) throws InseyeTrackerException
+public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeDataListener)
 ```
 
-Subscribes to gaze data updates.
+Subscribes to gaze data updates. `startStreamingGazeData()` must be called before this method.
 
 `gazeDataListener` The listener to receive gaze data updates.
 
-Throws an `InseyeTrackerException` if an error occurs while subscribing to gaze data.
+---
 
 ##### `unsubscribeFromGazeData()`
 
@@ -146,6 +187,16 @@ public void unsubscribeFromGazeData()
 
 Unsubscribes from gaze data updates.
 
+---
+
+##### `getMostRecentGazeData()`
+```java
+public GazeData getMostRecentGazeData()
+```
+Returns the most recent gaze data, or null if no gaze data is available. startStreamingGazeData() must be called before this method.
+
+---
+
 ##### `startCalibration()`
 
 ```java
@@ -153,13 +204,7 @@ public CompletableFuture<ActionResult> startCalibration()
 ```
 Starts the built-in calibration procedure. Returns a `CompletableFuture` that completes when the calibration procedure finishes. The result of the future indicates whether the calibration was successful.
 
-##### `getDominantEye()`
-
-```java
-public Eye getDominantEye()
-```
-
-Returns the dominant eye of the user.
+---
 
 ##### `abortCalibration()`
 
@@ -169,6 +214,33 @@ public void abortCalibration()
 
 Aborts the ongoing calibration procedure.
 
+---
+
+##### `getDominantEye()`
+
+```java
+public Eye getDominantEye()
+```
+
+Returns the dominant eye of the user. This could be configured by user in `Inseye Service` settings ui
+
+Possible eye values:
+- `BOTH`
+- `LEFT`
+- `RIGHT`
+
+---
+
+##### `getScreenUtils()`
+
+```java
+public ScreenUtils getScreenUtils()
+```
+
+Returns the screen space converters for the Inseye tracker gaze data.
+
+---
+
 ##### `getServiceVersion()`
 
 ```java
@@ -176,6 +248,18 @@ public Version getServiceVersion()
 ```
 
 Returns the version of the Inseye service.
+
+---
+
+##### `getCalibrationVersion()`
+
+```java
+public Version getCalibrationVersion()
+```
+
+Returns the version of the eye tracker caliration app.
+
+---
 
 ##### `getFirmwareVersion()`
 
@@ -191,7 +275,7 @@ Returns the version of the eye tracker firmware.
 
 Data is representen in radian angles where (0,0) is located in screen center  
 
-For screen space and view conversion form angle use methods from `ScreenUtils`
+For screen space and view conversion form angle use methods from `ScreenUtils` in combination with `GazeDataExtension`
 
 #### Fields
 
