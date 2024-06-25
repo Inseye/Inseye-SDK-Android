@@ -35,9 +35,4 @@ public class GazeDataExtension {
     public static Vector2D getGazeRightEye(GazeData gazeData) {
         return new Vector2D(gazeData.right_x, gazeData.right_y);
     }
-
-
-
-
-
 }

@@ -29,6 +29,13 @@ import lombok.Getter;
  */
 public class InseyeTracker {
     private static final String TAG = InseyeTracker.class.getSimpleName();
+
+    /**
+     * Interface for listening to eye tracker status changes.
+     */
+    public interface IEyeTrackerStatusListener {
+        void onTrackerAvailabilityChanged(TrackerAvailability availability);
+    }
     /**
      *  Returns the version of the Inseye service.
      */
@@ -44,8 +51,6 @@ public class InseyeTracker {
      */
     @Getter
     private final Version calibrationVersion = new Version();
-
-
     /**
      * Returns the screen space utils for the Inseye tracker.
      */
@@ -55,11 +60,6 @@ public class InseyeTracker {
     private IServiceBuiltInCalibrationCallback calibrationAbortHandler;
     private final ISharedService serviceInterface;
     private GazeDataReader gazeDataReader;
-
-    public interface IEyeTrackerStatusListener {
-        void onTrackerAvailabilityChanged(TrackerAvailability availability);
-    }
-
 
     /**
      * Constructs a new InseyeTracker instance.
@@ -147,39 +147,6 @@ public class InseyeTracker {
 
 
     /**
-     * Returns the most recent gaze data.
-     *
-     * @return @Nullable The most recent gaze data, or null if no gaze data is available.
-     */
-    public GazeData getMostRecentGazeData() {
-        if(gazeDataReader != null ) return gazeDataReader.getMostRecentGazeData();
-        else return null;
-    }
-
-
-    /**
-     * Subscribes to gaze data updates.
-     *
-     * @param gazeListener The listener to receive gaze data updates.
-     */
-    public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeListener)  {
-        if(gazeDataReader != null) {
-            gazeDataReader.addGazeListener(gazeListener);
-        }
-
-    }
-
-    /**
-     * Unsubscribes from gaze data updates.
-     * @param gazeListener The listener to stop receiving gaze data updates.
-     */
-    public void unsubscribeFromGazeData(@NonNull GazeDataReader.IGazeData gazeListener) {
-        if(gazeDataReader != null) {
-            gazeDataReader.removeGazeListener(gazeListener);
-        }
-    }
-
-    /**
      * Starts streaming gaze data.
      * @throws InseyeTrackerException if gaze data streaming fails.
      */
@@ -213,6 +180,42 @@ public class InseyeTracker {
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    /**
+     * Subscribes to gaze data updates.
+     * <p>
+     * {@link #startStreamingGazeData()} must be called before calling this method.
+     * @param gazeListener The listener to receive gaze data updates.
+     */
+    public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeListener)  {
+        if(gazeDataReader != null) {
+            gazeDataReader.addGazeListener(gazeListener);
+        }
+
+    }
+
+    /**
+     * Unsubscribes from gaze data updates.
+     * @param gazeListener The listener to stop receiving gaze data updates.
+     */
+    public void unsubscribeFromGazeData(@NonNull GazeDataReader.IGazeData gazeListener) {
+        if(gazeDataReader != null) {
+            gazeDataReader.removeGazeListener(gazeListener);
+        }
+    }
+
+    /**
+     * Returns the most recent gaze data.
+     * <p>
+     *{@link #startStreamingGazeData()} must be called before calling this method.
+     *
+     * @return The most recent gaze data, or null if no gaze data is available.
+     */
+    public GazeData getMostRecentGazeData() {
+        if(gazeDataReader != null ) return gazeDataReader.getMostRecentGazeData();
+        else return null;
     }
 
         /**
@@ -260,7 +263,8 @@ public class InseyeTracker {
      */
     public void abortCalibration() {
         try {
-            if(calibrationAbortHandler != null) calibrationAbortHandler.abortCalibrationProcedure();
+            if(calibrationAbortHandler != null)
+                calibrationAbortHandler.abortCalibrationProcedure();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
