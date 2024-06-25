@@ -73,7 +73,7 @@ public InseyeSDK(Context context)
 
 #### Methods
 
-##### `isServiceConnected()`
+##### *IsServiceConnected*
 
 ```java
 public boolean isServiceConnected()
@@ -83,7 +83,7 @@ Returns `true` if the Inseye service is connected, `false` otherwise.
 
 ---
 
-##### `getEyeTracker()`
+##### *GetEyeTracker*
 
 ```java
 public CompletableFuture<InseyeTracker> getEyeTracker()
@@ -93,7 +93,7 @@ Asynchronously retrieves an instance of [InseyeTracker](#inseyetracker). Returns
 
 ---
 
-##### `dispose()`
+##### *Dispose*
 
 ```java
 public void dispose()
@@ -108,7 +108,7 @@ Disposes InseyeTracker instance
 
 #### Methods
 
-##### `getTrackerAvailability()`
+##### *GetTrackerAvailability*
 
 ```java
 public TrackerAvailability getTrackerAvailability()
@@ -125,7 +125,7 @@ Returns the current availability status of the eye tracker.
 
 ---
 
-##### `subscribeToTrackerStatus(IEyetrackerEventListener eventListener)`
+##### *SubscribeToTrackerStatus*
 
 ```java
 public void subscribeToTrackerStatus(IEyetrackerEventListener eventListener)
@@ -137,7 +137,7 @@ Subscribes to eye tracker status events.
 
 ---
 
-##### `unsubscribeFromTrackerStatus()`
+##### *UnsubscribeFromTrackerStatus*
 
 ```java
 public void unsubscribeFromTrackerStatus()
@@ -147,7 +147,7 @@ Unsubscribes from eye tracker status events.
 
 ---
 
-##### `startStreamingGazeData()`
+##### *StartStreamingGazeData*
 
 ``` java
 public void startStreamingGazeData() throws InseyeTrackerException
@@ -157,7 +157,7 @@ Starts streaming gaze data. Throws an InseyeTrackerException if gaze data stream
 
 ---
 
-##### `stopStreamingGazeData()`
+##### *StopStreamingGazeData*
 
 ``` java
 public void stopStreamingGazeData()
@@ -167,7 +167,7 @@ Stops streaming gaze data. That means `IEyetrackerEventListener` stops receiving
 
 ---
 
-##### `subscribeToGazeData(GazeDataReader.IGazeData gazeDataListener)`
+##### *SubscribeToGazeData*
 
 ```java
 public void subscribeToGazeData(@NonNull GazeDataReader.IGazeData gazeDataListener)
@@ -179,7 +179,7 @@ Subscribes to gaze data updates. `startStreamingGazeData()` must be called befor
 
 ---
 
-##### `unsubscribeFromGazeData()`
+##### *UnsubscribeFromGazeData*
 
 ```java
 public void unsubscribeFromGazeData()
@@ -189,15 +189,15 @@ Unsubscribes from gaze data updates.
 
 ---
 
-##### `getMostRecentGazeData()`
+##### *GetMostRecentGazeData*
 ```java
 public GazeData getMostRecentGazeData()
 ```
-Returns the most recent gaze data, or null if no gaze data is available. startStreamingGazeData() must be called before this method.
+Returns the most recent `GazeData`, or null if no gaze data is available. `startStreamingGazeData()` must be called before this method.
 
 ---
 
-##### `startCalibration()`
+##### *StartCalibration*
 
 ```java
 public CompletableFuture<ActionResult> startCalibration()
@@ -206,7 +206,7 @@ Starts the built-in calibration procedure. Returns a `CompletableFuture` that co
 
 ---
 
-##### `abortCalibration()`
+##### *AbortCalibration*
 
 ```java
 public void abortCalibration()
@@ -216,7 +216,7 @@ Aborts the ongoing calibration procedure.
 
 ---
 
-##### `getDominantEye()`
+##### *GetDominantEye*
 
 ```java
 public Eye getDominantEye()
@@ -231,7 +231,7 @@ Possible eye values:
 
 ---
 
-##### `getScreenUtils()`
+##### *GetScreenUtils*
 
 ```java
 public ScreenUtils getScreenUtils()
@@ -241,7 +241,7 @@ Returns the screen space converters for the Inseye tracker gaze data.
 
 ---
 
-##### `getServiceVersion()`
+##### *GetServiceVersion*
 
 ```java
 public Version getServiceVersion()
@@ -251,7 +251,7 @@ Returns the version of the Inseye service.
 
 ---
 
-##### `getCalibrationVersion()`
+##### *GetCalibrationVersion*
 
 ```java
 public Version getCalibrationVersion()
@@ -261,7 +261,7 @@ Returns the version of the eye tracker caliration app.
 
 ---
 
-##### `getFirmwareVersion()`
+##### *GetFirmwareVersion*
 
 ```java
 public Version getFirmwareVersion()
@@ -275,7 +275,7 @@ Returns the version of the eye tracker firmware.
 
 Data is representen in radian angles where (0,0) is located in screen center  
 
-For screen space and view conversion form angle use methods from `ScreenUtils` in combination with `GazeDataExtension`
+For screen space and view conversion form angle use methods from [`ScreenUtils`](https://github.com/Inseye/Inseye-SDK-Android/blob/main/inseye_sdk/src/main/java/com/inseye/sdk/ScreenUtils.java) in combination with [`GazeDataExtension`](https://github.com/Inseye/Inseye-SDK-Android/blob/main/inseye_sdk/src/main/java/com/inseye/sdk/GazeDataExtension.java)
 
 #### Fields
 
