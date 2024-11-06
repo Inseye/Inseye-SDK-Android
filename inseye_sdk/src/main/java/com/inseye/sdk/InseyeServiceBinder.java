@@ -41,7 +41,7 @@ public class InseyeServiceBinder {
         this.inseyeServiceConnection = inseyeServiceConnection;
 
         Intent connectionIntent = ServiceConnectionIntentFactory.CreateServiceConnectIntent(context);
-        connectionIntent.putExtra(ServiceConnectionIntentFactory.META, "Inseye_Android_SDK " + BuildConfig.INSEYE_SDK_VERSION);
+        connectionIntent.putExtra(ServiceConnectionIntentFactory.META, "AndroidSDK " + BuildConfig.INSEYE_SDK_VERSION);
 
         // Attempt to bind the service
         boolean serviceExist = context.bindService(connectionIntent, internalConnection, Context.BIND_AUTO_CREATE);
