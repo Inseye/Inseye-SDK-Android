@@ -1,35 +1,23 @@
 [versions]
-agp = "8.5.0"
-androidxJunit = "1.1.5"
-appcompatVersion = "1.7.0"
+agp = "8.7.2"
 commonsMath3 = "3.6.1"
-espressoCoreVersion = "3.5.1"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
 appcompat = "1.7.0"
-lombok = "1.18.32"
+lombok = "1.18.34"
 material = "1.12.0"
-activity = "1.9.0"
-constraintlayout = "2.1.4"
-materialVersion = "1.12.0"
-lombokVersion = "1.18.30"
+rules = "1.6.1"
 
 [libraries]
-appcompat-v140 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
+androidx-rules = { module = "androidx.test:rules", version.ref = "rules" }
 commons-math3 = { module = "org.apache.commons:commons-math3", version.ref = "commonsMath3" }
-espresso-core-v340 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-junit-v113 = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-material-v140 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
-projectlombok-lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombokVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

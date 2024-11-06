@@ -30,14 +30,16 @@ android {
 
 dependencies {
 
-    implementation libs.appcompat
-    implementation libs.material
-    implementation libs.activity
-    implementation libs.constraintlayout
     implementation project(':inseye_sdk')
     implementation project(':inseye_client_api')
-    implementation libs.projectlombok.lombok
+
+    implementation libs.androidx.appcompat
+    implementation libs.material
+
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
     testImplementation libs.junit
-    androidTestImplementation libs.ext.junit
-    androidTestImplementation libs.espresso.core
+    androidTestImplementation libs.androidx.junit
+    androidTestImplementation libs.androidx.espresso.core
 }

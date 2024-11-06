@@ -9,6 +9,7 @@ import android.os.IBinder;
 import androidx.annotation.NonNull;
 
 import com.inseye.shared.communication.ISharedService;
+import com.inseye.shared.utils.ServiceConnectionIntentFactory;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -38,18 +39,12 @@ public class InseyeServiceBinder {
     // Method to bind the service with the provided callback
     public void bind(@NonNull IServiceBindCallback inseyeServiceConnection) {
         this.inseyeServiceConnection = inseyeServiceConnection;
-        Intent serviceIntent = new Intent();
 
-        // Setting the component with the service's package name and class required to bind
-        ComponentName component = new ComponentName(
-                context.getString(com.inseye.shared.R.string.service_package_name),
-                context.getString(com.inseye.shared.R.string.service_class_name)
-        );
-
-        serviceIntent.setComponent(component);
+        Intent connectionIntent = ServiceConnectionIntentFactory.CreateServiceConnectIntent(context);
+        connectionIntent.putExtra(ServiceConnectionIntentFactory.META, "Inseye_Android_SDK " + BuildConfig.INSEYE_SDK_VERSION);
 
         // Attempt to bind the service
-        boolean serviceExist = context.bindService(serviceIntent, internalConnection, Context.BIND_AUTO_CREATE);
+        boolean serviceExist = context.bindService(connectionIntent, internalConnection, Context.BIND_AUTO_CREATE);
 
         // If the service does not exist, trigger the error callback
         if(!serviceExist){
