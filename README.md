@@ -57,6 +57,8 @@ dependencies {
 ```
 Replace `TAG` with latest released version
 
+You can also use `AAR` lib directly that is attached to latest [release](https://github.com/Inseye/Inseye-SDK-Android/releases/latest)
+
 ## Usage
 
 ### InseyeSDK
