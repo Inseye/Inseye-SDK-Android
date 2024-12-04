@@ -30,13 +30,15 @@ public class ScreenUtils {
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
 
-        double y = height / 2.0 * (1 - gazeAngle2D.getY() / verticalHalfAngleRangeRad);
-
+        // Ensure the center of the screen is (0, 0)
         double aspectRatio = width / (double) height;
+
+        // Adjust for the aspect ratio to ensure proper horizontal centering
         double horizontalAngleRangeRad = verticalHalfAngleRangeRad * aspectRatio;
 
-        double x = width / 2.0 * (1 + gazeAngle2D.getX() / horizontalAngleRangeRad);
-
+        double x = width / 2.0 + (gazeAngle2D.getX() / horizontalAngleRangeRad) * (width / 2.0);
+        double y = height / 2.0 - (gazeAngle2D.getY() / verticalHalfAngleRangeRad) * (height / 2.0);
+        // Return the calculated screen space coordinates
         return new Vector2D(x, y);
     }
 

@@ -3,17 +3,17 @@ plugins {
     id 'maven-publish'
 }
 
-def libraryVersion = '0.2.0'
+def libraryVersion = '0.2.1'
 
 android {
     namespace 'com.inseye.sdk'
-    compileSdk 34
+    compileSdk 35
 
 
     defaultConfig {
         buildFeatures.buildConfig true
         minSdk 27
-        targetSdk 34
+        targetSdk 35
 
         versionName libraryVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
