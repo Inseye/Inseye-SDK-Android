@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-def libraryVersion = '0.2.1'
+def libraryVersion = '0.3.0'
 
 android {
     namespace 'com.inseye.sdk'

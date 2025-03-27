@@ -7,7 +7,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.inseye.shared.communication.ActionResult;
 import com.inseye.shared.communication.CalibrationPoint;
 import com.inseye.shared.communication.CalibrationPointResponse;
 import com.inseye.shared.communication.Eye;
@@ -18,7 +17,6 @@ import com.inseye.shared.communication.IEyetrackerEventListener;
 import com.inseye.shared.communication.IServiceBuiltInCalibrationCallback;
 import com.inseye.shared.communication.IServiceCalibrationCallback;
 import com.inseye.shared.communication.ISharedService;
-import com.inseye.shared.communication.IntActionResult;
 import com.inseye.shared.communication.Version;
 import com.inseye.shared.communication.TrackerAvailability;
 import com.inseye.shared.communication.VisibleFov;
@@ -157,17 +155,16 @@ public class InseyeTracker {
      */
     public void startStreamingGazeData() throws InseyeTrackerException {
         try {
-            IntActionResult result = serviceInterface.startStreamingGazeData();
-            if(result.success) {
-                int udpPort = result.value;
-                Log.i(TAG, "port:" + udpPort);
+            int port = serviceInterface.startStreamingGazeData();
+            if(port > 0) {
+                Log.i(TAG, "port:" + port);
                 if(gazeDataReader == null || gazeDataReader.isInterrupted()) {
-                    gazeDataReader = new GazeDataReader(udpPort);
+                    gazeDataReader = new GazeDataReader(port);
                     gazeDataReader.start();
                 }
             } else {
-                Log.e(TAG, "gaze stream error: " + result.errorMessage);
-                throw new InseyeTrackerException(result.errorMessage);
+                Log.e(TAG, "gaze stream error port:" + port);
+                throw new InseyeTrackerException("gaze stream error port:" + port);
             }
         } catch (RemoteException | UnknownHostException | SocketException e) {
             throw new InseyeTrackerException(e);
@@ -211,76 +208,31 @@ public class InseyeTracker {
         }
     }
 
-    /**
-     * Returns the most recent gaze data.
-     * <p>
-     *{@link #startStreamingGazeData()} must be called before calling this method.
-     *
-     * @return The most recent gaze data, or null if no gaze data is available.
-     */
-    public GazeData getMostRecentGazeData() {
-        if(gazeDataReader != null ) return gazeDataReader.getMostRecentGazeData();
-        else return null;
-    }
-
-    public void startCalibrationProcedure() throws RemoteException {
-        ActionResult result = ActionResult.success();
-        IServiceCalibrationCallback callback =  serviceInterface.startCalibrationProcedure(result, new ICalibrationCallback() {
-            @Override
-            public CalibrationPointResponse showNextCalibrationPoint(CalibrationPoint nextPoint) throws RemoteException {
-                return null;
-            }
-
-            @Override
-            public void finishCalibration(ActionResult calibrationResult) throws RemoteException {
-
-            }
-
-            @Override
-            public IBinder asBinder() {
-                return null;
-            }
-        });
-    }
-
-
-
         /**
      * Starts the built-in calibration procedure.
      *
      * @return A CompletableFuture that completes when the calibration procedure finishes.
-     *         The result of the future indicates whether the calibration was successful.
+     *         Throws an exception if the calibration procedure fails.
      */
-    public CompletableFuture<ActionResult> startCalibration() {
-        CompletableFuture<ActionResult> calibrationFuture = new CompletableFuture<>();
-        ActionResult result = new ActionResult();
+    public CompletableFuture<Void> startCalibration() {
+        CompletableFuture<Void> calibrationFuture = new CompletableFuture<>();
         try {
-            calibrationAbortHandler = serviceInterface.startBuiltInCalibrationProcedure(result, new IBuiltInCalibrationCallback.Stub() {
+            calibrationAbortHandler = serviceInterface.startBuiltInCalibrationProcedure(new IBuiltInCalibrationCallback.Stub() {
+
                 @Override
-                public void finishCalibration(ActionResult calibrationResult) throws RemoteException {
-                    Log.i(TAG, calibrationResult.toString());
-                    if(calibrationResult.successful) {
-                        Log.e(TAG, "calibration success");
-                        calibrationFuture.complete(ActionResult.success());
-                    }
-                    else {
-                        calibrationFuture.complete(ActionResult.error(calibrationResult.errorMessage));
-                        Log.e(TAG, "calibration fail: " + calibrationResult.errorMessage);
+                public void finishCalibration(boolean success, String errorMessage) throws RemoteException {
+                    if(success) {
+                        calibrationFuture.complete(null);
+                    } else {
+                        calibrationFuture.completeExceptionally(new InseyeTrackerException(errorMessage));
                     }
                 }
+
             });
         } catch (RemoteException e) {
             Log.e(TAG, "calibration remote exception: " + e);
             calibrationFuture.completeExceptionally(e);
         }
-        if(result.successful) {
-            Log.i(TAG, "calibration init success");
-        }
-        else {
-            Log.e(TAG, "calibration init fail: " + result.errorMessage);
-            calibrationFuture.complete(ActionResult.error(result.errorMessage));
-        }
-        // add timeout
 
         return calibrationFuture;
     }
