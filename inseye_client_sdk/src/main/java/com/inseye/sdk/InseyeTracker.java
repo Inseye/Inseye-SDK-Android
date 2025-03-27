@@ -1,5 +1,6 @@
 package com.inseye.sdk;
 
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -7,11 +8,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.inseye.shared.communication.ActionResult;
+import com.inseye.shared.communication.CalibrationPoint;
+import com.inseye.shared.communication.CalibrationPointResponse;
 import com.inseye.shared.communication.Eye;
 import com.inseye.shared.communication.GazeData;
 import com.inseye.shared.communication.IBuiltInCalibrationCallback;
+import com.inseye.shared.communication.ICalibrationCallback;
 import com.inseye.shared.communication.IEyetrackerEventListener;
 import com.inseye.shared.communication.IServiceBuiltInCalibrationCallback;
+import com.inseye.shared.communication.IServiceCalibrationCallback;
 import com.inseye.shared.communication.ISharedService;
 import com.inseye.shared.communication.IntActionResult;
 import com.inseye.shared.communication.Version;
@@ -217,6 +222,28 @@ public class InseyeTracker {
         if(gazeDataReader != null ) return gazeDataReader.getMostRecentGazeData();
         else return null;
     }
+
+    public void startCalibrationProcedure() throws RemoteException {
+        ActionResult result = ActionResult.success();
+        IServiceCalibrationCallback callback =  serviceInterface.startCalibrationProcedure(result, new ICalibrationCallback() {
+            @Override
+            public CalibrationPointResponse showNextCalibrationPoint(CalibrationPoint nextPoint) throws RemoteException {
+                return null;
+            }
+
+            @Override
+            public void finishCalibration(ActionResult calibrationResult) throws RemoteException {
+
+            }
+
+            @Override
+            public IBinder asBinder() {
+                return null;
+            }
+        });
+    }
+
+
 
         /**
      * Starts the built-in calibration procedure.

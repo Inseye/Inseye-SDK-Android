@@ -27,18 +27,16 @@ public class ScreenUtils {
      * @return a Vector2D object containing the screen space coordinates
      */
     public Vector2D angleToAbsoluteScreenSpace(Vector2D gazeAngle2D) {
-        int width = displayMetrics.widthPixels;
-        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;  // Screen width in pixels
+        int height = displayMetrics.heightPixels; // Screen height in pixels
 
-        // Ensure the center of the screen is (0, 0)
         double aspectRatio = width / (double) height;
 
-        // Adjust for the aspect ratio to ensure proper horizontal centering
         double horizontalAngleRangeRad = verticalHalfAngleRangeRad * aspectRatio;
 
-        double x = width / 2.0 + (gazeAngle2D.getX() / horizontalAngleRangeRad) * (width / 2.0);
-        double y = height / 2.0 - (gazeAngle2D.getY() / verticalHalfAngleRangeRad) * (height / 2.0);
-        // Return the calculated screen space coordinates
+        double x = (Math.cos(gazeAngle2D.getY()) * Math.cos(gazeAngle2D.getX()) / horizontalAngleRangeRad) * (width / 2.0) + (width / 2.0);
+        double y = (Math.cos(gazeAngle2D.getY()) * Math.sin(gazeAngle2D.getX()) / verticalHalfAngleRangeRad) * (height / 2.0) + (height / 2.0);
+
         return new Vector2D(x, y);
     }
 

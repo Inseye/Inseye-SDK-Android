@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace 'com.inseye.test_sdk'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.inseye.test_sdk"
         minSdk 27
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -30,7 +30,7 @@ android {
 
 dependencies {
 
-    implementation project(':inseye_sdk')
+    implementation project(':inseye_client_sdk')
     implementation project(':inseye_client_api')
 
     implementation libs.androidx.appcompat

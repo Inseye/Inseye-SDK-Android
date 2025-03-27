@@ -15,7 +15,6 @@ android {
         minSdk 27
         targetSdk 35
 
-        versionName libraryVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         buildConfigField "String", "INSEYE_SDK_VERSION", "\"${libraryVersion}\""
@@ -53,6 +52,7 @@ dependencies {
     implementation libs.androidx.appcompat
     implementation libs.material
     api libs.commons.math3
+
 
     compileOnly libs.lombok
     annotationProcessor libs.lombok

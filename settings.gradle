@@ -23,7 +23,7 @@ dependencyResolutionManagement {
 
 
 rootProject.name = "Inseye SDK Android"
-include ':inseye_sdk'
+include ':inseye_client_sdk'
 include ':inseye_client_api'
 project(':inseye_client_api').projectDir = new File(rootDir, 'inseye_client_api/module/')
 
