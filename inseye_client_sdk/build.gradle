@@ -47,7 +47,7 @@ android {
 }
 
 dependencies {
-    api project(':inseye_client_api')
+    api project(':local_client_shared')
 
     implementation libs.androidx.appcompat
     implementation libs.material
