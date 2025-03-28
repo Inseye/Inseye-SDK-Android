@@ -2,8 +2,6 @@ package com.inseye.sdk;
 
 import android.util.Log;
 
-import androidx.annotation.Nullable;
-
 import com.inseye.shared.communication.GazeData;
 
 import java.io.Closeable;
@@ -16,7 +14,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 

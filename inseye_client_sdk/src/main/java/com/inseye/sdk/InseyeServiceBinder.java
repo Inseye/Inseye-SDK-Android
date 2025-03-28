@@ -11,8 +11,6 @@ import androidx.annotation.NonNull;
 import com.inseye.shared.communication.ISharedService;
 import com.inseye.shared.utils.ServiceConnectionIntentFactory;
 
-import java.util.concurrent.CompletableFuture;
-
 public class InseyeServiceBinder {
     private static final String TAG = InseyeServiceBinder.class.getSimpleName();
 

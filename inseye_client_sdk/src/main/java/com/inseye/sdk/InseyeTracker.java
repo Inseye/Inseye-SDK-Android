@@ -1,16 +1,11 @@
 package com.inseye.sdk;
 
-import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.inseye.shared.communication.CalibrationPoint;
-import com.inseye.shared.communication.CalibrationPointResponse;
 import com.inseye.shared.communication.Eye;
-import com.inseye.shared.communication.GazeData;
 import com.inseye.shared.communication.IBuiltInCalibrationCallback;
 import com.inseye.shared.communication.ICalibrationCallback;
 import com.inseye.shared.communication.IEyetrackerEventListener;

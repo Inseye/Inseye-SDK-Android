@@ -1,10 +1,7 @@
 package com.inseye.test_sdk;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.view.Choreographer;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +23,6 @@ import com.inseye.shared.communication.GazeData;
 import com.inseye.shared.communication.TrackerAvailability;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
-
-import lombok.experimental.ExtensionMethod;
 
 public class TestActivity extends AppCompatActivity implements GazeDataReader.IGazeData, InseyeTracker.IEyeTrackerStatusListener {
 
